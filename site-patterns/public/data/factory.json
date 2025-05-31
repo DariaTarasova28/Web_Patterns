@@ -1,0 +1,56 @@
+{
+  "pattern": {
+    "name": {
+      "en": "Factory Method",
+      "ru": "Фабричный метод"
+    },
+    "type": "Creational",
+    "description": {
+      "main": "Фабричный метод — это порождающий паттерн проектирования, который определяет общий интерфейс для создания объектов в суперклассе, позволяя подклассам изменять тип создаваемых объектов.",
+      "detailed": "Паттерн Фабричный метод предлагает создавать объекты не напрямую, используя оператор new, а через вызов особого фабричного метода. Это позволяет подклассам переопределять фабричный метод для изменения типа создаваемого продукта, сохраняя общий интерфейс для всех создаваемых объектов."
+    },
+    "advantages": [
+      "Гибкость и расширяемость: можно добавлять новые типы продуктов без изменения существующего кода.",
+      "Снижение связанности между клиентом и конкретными классами продуктов.",
+      "Упрощение кода за счёт избавления от больших условных операторов для создания объектов.",
+      "Соответствие принципам SOLID (особенно принципам единственной ответственности и открытости/закрытости)."
+    ],
+    "implementation": {
+      "general": "Создаётся общий интерфейс продукта, абстрактный класс или интерфейс создателя с фабричным методом, и конкретные подклассы создателей, которые реализуют фабричный метод, создавая разные продукты.",
+      "variations": [
+        "Абстрактный класс с абстрактным фабричным методом",
+        "Интерфейс создателя с реализациями",
+        "Использование фабричного метода в сочетании с другими паттернами, например, Абстрактной фабрикой"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Transport",
+        "description": "Система создания различных транспортных средств (автомобили, велосипеды) через фабричный метод.",
+        "code": "/**\n * Общий интерфейс \"продукта\" - транспорт.\n */\npublic interface Transport {\n    void drive();\n}\n\n/**\n * Конкретный продукт - Car\n */\npublic class Car implements Transport {\n    @Override\n    public void drive() {\n        System.out.println(\"Вождение автомобиля.\");\n    }\n}\n\n/**\n * Конкретный продукт - Bike\n */\npublic class Bike implements Transport {\n    @Override\n    public void drive() {\n        System.out.println(\"Вождение велосипеда.\");\n    }\n}\n\n/**\n * Абстрактный создатель\n */\npublic abstract class TransportFactory {\n    public abstract Transport createTransport();\n}\n\n/**\n * Конкретный создатель для Car\n */\npublic class CarFactory extends TransportFactory {\n    @Override\n    public Transport createTransport() {\n        return new Car();\n    }\n}\n\n/**\n * Конкретный создатель для Bike\n */\npublic class BikeFactory extends TransportFactory {\n    @Override\n    public Transport createTransport() {\n        return new Bike();\n    }\n}\n\n/**\n * Тестирование\n */\npublic class TransportMain {\n    public static void main(String[] args) {\n        TransportFactory factory = new CarFactory();\n        Transport car = factory.createTransport();\n\n        factory = new BikeFactory();\n        Transport bike = factory.createTransport();\n\n        car.drive();\n        bike.drive();\n    }\n}"
+      },
+      {
+        "name": "Document",
+        "description": "Создание различных типов документов (Word, PDF) с помощью фабричного метода.",
+        "code": "/**\n * Общий интерфейс документа\n */\npublic interface Document {\n    void open();\n    void save();\n}\n\n/**\n * Конкретный продукт - WordDocument\n */\npublic class WordDocument implements Document {\n    @Override\n    public void open() {\n        System.out.println(\"Открытие Word документа.\");\n    }\n    @Override\n    public void save() {\n        System.out.println(\"Сохранение Word документа.\");\n    }\n}\n\n/**\n * Конкретный продукт - PdfDocument\n */\npublic class PdfDocument implements Document {\n    @Override\n    public void open() {\n        System.out.println(\"Открытие PDF документа.\");\n    }\n    @Override\n    public void save() {\n        System.out.println(\"Сохранение PDF документа.\");\n    }\n}\n\n/**\n * Интерфейс фабрики\n */\npublic interface DocumentFactory {\n    Document createDocument();\n}\n\n/**\n * Конкретные фабрики\n */\npublic class WordDocumentFactory implements DocumentFactory {\n    @Override\n    public Document createDocument() {\n        return new WordDocument();\n    }\n}\n\npublic class PdfDocumentFactory implements DocumentFactory {\n    @Override\n    public Document createDocument() {\n        return new PdfDocument();\n    }\n}\n\n/**\n * Тестирование\n */\npublic class DocumentMain {\n    public static void main(String[] args) {\n        DocumentFactory wordFactory = new WordDocumentFactory();\n        DocumentFactory pdfFactory = new PdfDocumentFactory();\n\n        Document wordDoc = wordFactory.createDocument();\n        Document pdfDoc = pdfFactory.createDocument();\n\n        wordDoc.open();\n        wordDoc.save();\n\n        pdfDoc.open();\n        pdfDoc.save();\n    }\n}"
+      }
+    ],
+    "pros": [
+      "Гибкость и расширяемость",
+      "Снижение связанности",
+      "Упрощение кода",
+      "Поддержка принципов SOLID"
+    ],
+    "cons": [
+      "Увеличение количества классов",
+      "Сложность для понимания новичками из-за абстракций"
+    ],
+    "sources": [
+      "Design Patterns: Elements of Reusable Object-Oriented Software, Gamma et al.",
+      "Refactoring Guru: Factory Method Pattern",
+      "https://refactoring.guru/ru/design-patterns/factory-method"
+    ],
+    "fluent_interface": ""
+  }
+}
+

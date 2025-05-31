@@ -1,0 +1,70 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Абстрактная фабрика",
+      "en": "Abstract Factory"
+    },
+    "type": "Порождающий паттерн",
+    "description": {
+      "main": "Абстрактная фабрика — это порождающий паттерн, который предоставляет интерфейс для создания семейств взаимосвязанных объектов без указания их конкретных классов.",
+      "detailed": "Паттерн позволяет создавать семейства продуктов, которые должны использоваться вместе, не заботясь о том, какие конкретные классы этих продуктов будут использованы. Это особенно полезно, если ваша система должна быть независима от способа создания, композиции и представления продуктов."
+    },
+    "advantages": [
+      "Изолирует конкретные классы продуктов.",
+      "Обеспечивает совместимость между продуктами внутри семейства.",
+      "Упрощает замену семейств продуктов."
+    ],
+    "implementation": {
+      "general": "Паттерн реализуется через общий интерфейс фабрики, который определяет методы создания продуктов. Конкретные фабрики реализуют этот интерфейс, создавая соответствующие продукты.",
+      "variations": [
+        "Можно использовать паттерн вместе с паттерном 'Фабричный метод'.",
+        "Можно объединить с паттерном 'Прототип', чтобы клонировать продукты."
+      ]
+    },
+    "examples": [
+      {
+        "name": "GUI Фреймворк",
+        "description": "Создание графических интерфейсов под разные платформы: Windows и Mac. Каждая конкретная фабрика создаёт соответствующие элементы UI.",
+        "features": [
+          "Создание семейств кнопок, чекбоксов и окон.",
+          "Изоляция клиентского кода от платформенной специфики."
+        ],
+        "code": "interface Button { render(): void; }\n\nclass WindowsButton implements Button {\n  render() { console.log('Rendering Windows button'); }\n}\n\nclass MacButton implements Button {\n  render() { console.log('Rendering Mac button'); }\n}\n\ninterface GUIFactory {\n  createButton(): Button;\n}\n\nclass WindowsFactory implements GUIFactory {\n  createButton() { return new WindowsButton(); }\n}\n\nclass MacFactory implements GUIFactory {\n  createButton() { return new MacButton(); }\n}\n\nfunction clientCode(factory: GUIFactory) {\n  const button = factory.createButton();\n  button.render();\n}\n\nclientCode(new WindowsFactory());"
+      },
+      {
+        "name": "Создание тем оформления",
+        "description": "Фабрика создаёт соответствующие стилизованные компоненты для UI в зависимости от темы (светлая/тёмная).",
+        "features": [
+          "Гибкая смена темы без изменения логики приложения.",
+          "Поддержка различных стилей компонентов."
+        ],
+        "code": "// Light и Dark темы создают свои компоненты:\ninterface ThemeFactory {\n  createHeader(): Header;\n  createFooter(): Footer;\n}\n\nclass LightThemeFactory implements ThemeFactory { ... }\nclass DarkThemeFactory implements ThemeFactory { ... }"
+      }
+    ],
+    "pros": [
+      "Гарантирует согласованность продуктов в семействе.",
+      "Изолирует код создания объектов.",
+      "Упрощает замену семейств продуктов."
+    ],
+    "cons": [
+      "Сложнее добавлять новые типы продуктов.",
+      "Увеличивает количество классов в проекте."
+    ],
+    "additional_info": {
+      "fluent_interface": "Может использоваться в цепочках построения UI-компонентов.",
+      "standard_library_example": "javax.swing.UIManager.getLookAndFeel() в Java.",
+      "literature_references": {
+        "book1": "Э. Гамма и др. — Приемы объектно-ориентированного проектирования. Паттерны проектирования",
+        "book2": "Стивен Метц — Design Patterns in Ruby"
+      }
+    },
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/abstract-factory",
+      "https://en.wikipedia.org/wiki/Abstract_factory_pattern"
+    ]
+  }
+}
+
+
+
+

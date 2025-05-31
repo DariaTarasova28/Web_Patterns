@@ -1,0 +1,107 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Пул объектов",
+      "en": "Object Pool"
+    },
+    "type": "Порождающий паттерн проектирования",
+    "description": {
+      "main": "Пул объектов — это порождающий паттерн проектирования, который предоставляет способ управления набором предварительно созданных объектов, готовых к использованию.",
+      "detailed": "Вместо создания новых объектов каждый раз, когда они необходимы, объекты берутся из пула и возвращаются обратно после использования. Это особенно полезно для объектов, создание которых дорогостоящее или ресурсоёмкое, например, соединения к базе данных, потоки, сетевые соединения и т.д. Основная идея заключается в создании ограниченного набора объектов заранее и управлении их использованием."
+    },
+    "usage_scenarios": [
+      "Создание объектов ресурсоёмкое (например, подключение к базе данных)",
+      "Необходимость повторного использования объектов",
+      "Ограничение количества экземпляров для предотвращения исчерпания ресурсов",
+      "Управление ресурсами, такими как соединения с БД или потоки"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "ObjectPool (Пул объектов)",
+          "description": "Класс, который управляет пулом объектов. Отвечает за выдачу объектов клиентам и их возвращение в пул.",
+          "methods": [
+            "borrowObject(): Выдаёт объект из пула",
+            "returnObject(Object obj): Принимает объект обратно в пул",
+            "createObject(): Создаёт новый объект при необходимости"
+          ]
+        },
+        {
+          "name": "Reusable (Повторно используемый)",
+          "description": "Интерфейс или абстрактный класс, который определяет общие методы для объектов, управляемых пулом."
+        },
+        {
+          "name": "ConcreteReusable (Конкретный повторно используемый)",
+          "description": "Класс, реализующий интерфейс Reusable. Представляет конкретный тип объектов, управляемых пулом."
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Реализация паттерна включает класс ObjectPool, который управляет пулом объектов, интерфейс Reusable для объектов пула и конкретные реализации этих объектов.",
+      "details": {
+        "pool_management": "Пул должен отслеживать доступные и используемые объекты",
+        "object_reset": "Объекты должны иметь метод reset() для очистки состояния перед повторным использованием",
+        "thread_safety": "Для многопоточного использования необходима синхронизация методов пула"
+      }
+    },
+    "examples": [
+      {
+        "name": "Пул подключений к БД",
+        "description": "Реализация пула для управления соединениями с базой данных",
+        "features": [
+          "Предварительное создание соединений",
+          "Управление состоянием соединений",
+          "Ограничение максимального количества соединений"
+        ],
+        "code": "public class DBConnection implements Reusable {\n    private boolean inUse;\n    private String connectionId;\n\n    public DBConnection(String connectionId) {\n        this.connectionId = connectionId;\n        this.inUse = false;\n        System.out.println(\"Соединение \" + connectionId + \" установлено.\");\n    }\n\n    public void connect() {\n        if (!inUse) {\n            inUse = true;\n            System.out.println(\"Соединение \" + connectionId + \" используется.\");\n        }\n    }\n\n    public void disconnect() {\n        if (inUse) {\n            inUse = false;\n            System.out.println(\"Соединение \" + connectionId + \" освобождено.\");\n        }\n    }\n\n    @Override\n    public void reset() {\n        disconnect();\n        System.out.println(\"Соединение \" + connectionId + \" сброшено.\");\n    }\n}\n\npublic class DBConnectionPool {\n    private static final int MAX_POOL_SIZE = 10;\n    private List<DBConnection> available = new ArrayList<>();\n    private List<DBConnection> inUse = new ArrayList<>();\n\n    public DBConnectionPool() {\n        for (int i = 0; i < MAX_POOL_SIZE; i++) {\n            available.add(new DBConnection(\"Connection_\" + (i+1)));\n        }\n    }\n\n    public synchronized DBConnection borrowConnection() {\n        if (available.isEmpty()) {\n            throw new RuntimeException(\"No connections available\");\n        }\n        DBConnection conn = available.remove(0);\n        inUse.add(conn);\n        conn.connect();\n        return conn;\n    }\n\n    public synchronized void returnConnection(DBConnection conn) {\n        if (inUse.remove(conn)) {\n            conn.reset();\n            available.add(conn);\n        }\n    }\n}"
+      }
+    ],
+    "advantages": [
+      "Повышение производительности: Сокращает время на создание и уничтожение объектов",
+      "Эффективное использование ресурсов: Позволяет ограничить количество одновременно используемых объектов",
+      "Управление ресурсами: Обеспечивает централизованный контроль над использованием объектов",
+      "Снижение нагрузки на систему: Уменьшает количество операций создания и уничтожения объектов"
+    ],
+    "disadvantages": [
+      "Сложность реализации: Требует дополнительной логики для управления пулом",
+      "Необходимость управления состоянием объектов: Объекты должны быть готовы к повторному использованию",
+      "Проблемы с потокобезопасностью: В многопоточной среде необходима синхронизация",
+      "Скрытые зависимости: Клиентский код зависит от пула объектов"
+    ],
+    "comparison_table": {
+      "title": "Сравнение реализаций Object Pool",
+      "headers": ["Реализация", "Потокобезопасность", "Тип объектов", "Инициализация", "Гибкость"],
+      "rows": [
+        ["Пул подключений к БД", "Да", "Соединения с БД", "Жадная", "Низкая"],
+        ["Пул потоков", "Да", "Потоки выполнения", "Жадная", "Средняя"],
+        ["Generic Object Pool", "Да", "Любые объекты", "Гибкая", "Очень высокая"]
+      ]
+    },
+    "criticism": {
+      "title": "Проблемы паттерна Object Pool",
+      "points": [
+        "Увеличивает сложность кода",
+        "Требует тщательного управления состоянием объектов",
+        "Может привести к утечкам памяти, если объекты не возвращаются в пул",
+        "Сложность в настройке оптимального размера пула",
+        "Не всегда улучшает производительность для простых объектов"
+      ]
+    },
+    "additional_info": {
+      "standard_library_example": "Java: java.util.concurrent.ThreadPoolExecutor, Apache Commons Pool",
+      "literature_references": {
+        "book1": "Design Patterns: Elements of Reusable Object-Oriented Software",
+        "book2": "Java Concurrency in Practice"
+      },
+      "articles": [
+        "Habr: Паттерн Object Pool и его реализация",
+        "Medium: Object Pool Design Pattern in Java"
+      ]
+    },
+    "sources": [
+      "Design Patterns: Elements of Reusable Object-Oriented Software",
+      "Java Concurrency in Practice",
+      "Apache Commons Pool Documentation"
+    ]
+  }
+}

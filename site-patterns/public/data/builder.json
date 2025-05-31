@@ -1,0 +1,78 @@
+{
+  "pattern": {
+    "name": {
+      "en": "Builder",
+      "ru": "Строитель"
+    },
+    "type": "Creational",
+    "description": {
+      "main": "Билдер — это порождающий паттерн проектирования, который позволяет создавать сложные объекты пошагово. Строитель даёт возможность использовать один и тот же код строительства для получения разных представлений объектов.",
+      "detailed": "В разработке программного обеспечения часто возникает необходимость создания объектов с множеством параметров, особенно когда некоторые из них являются опциональными. Паттерн проектирования Билдер (Builder) предоставляет гибкий способ создания сложных объектов, разделяя процесс их конструирования и представляя различные варианты их построения."
+    },
+    "advantages": [
+      "Разбиение гиганского конструктора на отдельные шаги",
+      "Вариация шагов при создани объекта",
+      "За счет разных версий строителя может достигаться разный набор параметров в объекте",
+      "Использование параметров по умолчанию",
+      "Построение объекта на основе данных, получаемых в разных местах"
+    ],
+    "implementation": {
+      "general": "Реализация билдера в общем случае проста и заключается в разбиении телескопического конструктора на шаги.",
+      "variations": [
+        "Статический внутренний класс",
+        "Внешний класс с использованием интерфейсов",
+        "Билдер со всеми обязательными полями",
+        "Билдер с полями по умолчанию",
+        "Билдер без проверки переданных данных перед пострением объекта",
+        "Билдер с проверкой переданных данных перед пострением объекта",
+        "Объединение нескольких указанных выше вариантов"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Trip",
+        "description": "Пример класса поездки с большим конструктором",
+        "features": [
+          "Конструктор с большим кол-вом параметров",
+          "Вложенный статический билдер",
+          "В билдере указываются значения по умолчанию",
+          "Использование паттерна Fluent Interface"
+        ],
+        "code": "import java.time.LocalDate;\nimport java.util.Objects;\n\npublic class Trip {\n    private final LocalDate startDate;\n    private final LocalDate endDate;\n    private final String start;\n    private final String end;\n    private final Integer duration;\n    private final Integer numberTraveller;\n    private final Integer numberKids;\n    private final Integer minimumStars;\n    private final Integer minimumRecommendations;\n    private final Integer rating;\n    private final Integer minimumNumberRatings;\n\n    public Trip(LocalDate startDate, LocalDate endDate, String start, String end, Integer duration, Integer numberTraveller, Integer numberKids, Integer minimumStars, Integer minimumRecommendations, Integer rating, Integer minimumNumberRatings) {\n        this.startDate = startDate;\n        this.endDate = endDate;\n        this.start = start;\n        this.end = end;\n        this.duration = duration;\n        this.numberTraveller = numberTraveller;\n        this.numberKids = numberKids;\n        this.minimumStars = minimumStars;\n        this.minimumRecommendations = minimumRecommendations;\n        this.rating = rating;\n        this.minimumNumberRatings = minimumNumberRatings;\n    }\n\n    // ... остальные методы ...\n}"
+      },
+      {
+        "name": "Computer",
+        "description": "Пример класса компьютера",
+        "features": [
+          "Конструктор с большим кол-вом параметров",
+          "Вложенный статический билдер",
+          "В билдере указываются значения по умолчанию",
+          "Использование паттерна Fluent Interface"
+        ],
+        "code": "public class Computer {\n    private String CPU;\n    private String RAM;\n    private String storage;\n    private String GPU;\n    private String OS;\n\n    private Computer(Builder builder) {\n        this.CPU = builder.CPU;\n        this.RAM = builder.RAM;\n        this.storage = builder.storage;\n        this.GPU = builder.GPU;\n        this.OS = builder.OS;\n    }\n\n    // ... остальные методы ...\n}"
+      }
+    ],
+    "pros": [
+      "Разделение конструкции и представления",
+      "Упрощение создания объектов",
+      "Повышение читаемости кода",
+      "Гибкость"
+    ],
+    "cons": [
+      "Увеличение количества кода",
+      "Отсутствие поддержки рекурсии"
+    ],
+    "additional_info": {
+      "fluent_interface": "Fluent Interface — это стиль программирования/паттерн, который позволяет связывать вызовы методов друг с другом для создания более читаемого и выразительного кода.",
+      "standard_library_example": "Самой простой пример это класс StringBuilder. Этот класс позволяет работать с изменяемыми строками, где в качестве шагов создания добавляются символы в строку.",
+      "literature_references": {
+        "book1": "В книге Погружение в паттерны проектирования Александра Швеца объяснение билдера осложнено введением класса Директора.",
+        "book2": "Более удачный пример есть в книге Design Patterns with Java Olaf Mysch, где разбивается конструктор с 10+ параметрами."
+      }
+    },
+    "sources": [
+      "Design Patterns with Java: Builder",
+      "Введение в паттерны проектирования: Строитель"
+    ]
+  }
+}

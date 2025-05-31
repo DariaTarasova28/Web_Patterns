@@ -1,0 +1,126 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Одиночка",
+      "en": "Singleton"
+    },
+    "type": "Порождающий паттерн проектирования",
+    "description": {
+      "main": "Одиночка — это порождающий паттерн проектирования, который гарантирует, что у класса есть только один экземпляр, и предоставляет к нему глобальную точку доступа.",
+      "detailed": "Синглтон гарантирует наличие единственного экземпляра класса. Чаще всего это полезно для доступа к какому-то общему ресурсу, например, базе данных. Предоставляет глобальную точку доступа. Это не просто глобальная переменная, через которую можно достучаться к определённому объекту."
+    },
+    "usage_scenarios": [
+      "Необходимость наличия одного и только одного экземпляра класса: Например, класс, управляющий подключением к базе данных, логированием, конфигурациями приложения.",
+      "Предоставление глобальной точки доступа: Когда необходимо обеспечить доступ к одному экземпляру класса из разных частей программы.",
+      "Контроль над доступом к ресурсам: Например, управление пулом соединений, потоками и т.д."
+    ],
+    "implementation": {
+      "general": "Все реализации одиночки сводятся к тому, чтобы скрыть конструктор по умолчанию и создать публичный статический метод, который и будет контролировать жизненный цикл объекта-одиночки.",
+      "details": {
+        "naming_convention": "Принято, что статическое поле, хранящее ссылку на переменную имеет название instance, а статический метод получения доступа к экземпляру getInstance()."
+      }
+    },
+    "examples": [
+      {
+        "name": "Eager Initialization Singleton",
+        "description": "Жадная инициализация - экземпляр создаётся при загрузке класса",
+        "features": [
+          "Простота реализации",
+          "Потокобезопасность без дополнительной синхронизации",
+          "Экземпляр создаётся даже если он никогда не используется"
+        ],
+        "code": "public class EagerSingleton {\n    private static final EagerSingleton INSTANCE = new EagerSingleton();\n\n    private EagerSingleton() {}\n\n    public static EagerSingleton getInstance() {\n        return INSTANCE;\n    }\n}"
+      },
+      {
+        "name": "LazySingleton",
+        "description": "Ленивая инициализация - экземпляр создаётся только при первом обращении",
+        "features": [
+          "Экземпляр создаётся только при необходимости",
+          "Не потокобезопасен",
+          "Требуется дополнительная синхронизация для многопоточной среды"
+        ],
+        "code": "public class LazySingleton {\n    private static LazySingleton instance;\n\n    private LazySingleton() {}\n\n    public static LazySingleton getInstance() {\n        if (instance == null) {\n            instance = new LazySingleton();\n        }\n        return instance;\n    }\n}"
+      },
+      {
+        "name": "ThreadSafeSingleton",
+        "description": "Потокобезопасная реализация с synchronized",
+        "features": [
+          "Потокобезопасен",
+          "Снижение производительности из-за синхронизации",
+          "Гарантирует наличие только одного экземпляра"
+        ],
+        "code": "public class ThreadSafeSingleton {\n    private static ThreadSafeSingleton instance;\n\n    private ThreadSafeSingleton() {}\n\n    public static synchronized ThreadSafeSingleton getInstance() {\n        if (instance == null) {\n            instance = new ThreadSafeSingleton();\n        }\n        return instance;\n    }\n}"
+      },
+      {
+        "name": "Double-Checked Locking",
+        "description": "Эффективная потокобезопасная реализация",
+        "features": [
+          "Потокобезопасен",
+          "Синхронизация только при первом создании",
+          "Требуется volatile для переменной instance"
+        ],
+        "code": "public class DoubleCheckedLockingSingleton {\n    private static volatile DoubleCheckedLockingSingleton instance;\n\n    private DoubleCheckedLockingSingleton() {}\n\n    public static DoubleCheckedLockingSingleton getInstance() {\n        if (instance == null) {\n            synchronized (DoubleCheckedLockingSingleton.class) {\n                if (instance == null) {\n                    instance = new DoubleCheckedLockingSingleton();\n                }\n            }\n        }\n        return instance;\n    }\n}"
+      },
+      {
+        "name": "Bill Pugh Singleton",
+        "description": "Реализация с внутренним статическим классом",
+        "features": [
+          "Потокобезопасен без синхронизации",
+          "Ленивая инициализация",
+          "Не поддерживается до Java 5"
+        ],
+        "code": "public class BillPughSingleton {\n    private BillPughSingleton() {}\n\n    private static class SingletonHelper {\n        private static final BillPughSingleton INSTANCE = new BillPughSingleton();\n    }\n\n    public static BillPughSingleton getInstance() {\n        return SingletonHelper.INSTANCE;\n    }\n}"
+      },
+      {
+        "name": "Enum Singleton",
+        "description": "Реализация через enum",
+        "features": [
+          "Потокобезопасен по умолчанию",
+          "Защита от рефлексии и сериализации",
+          "Не поддерживает наследование"
+        ],
+        "code": "public enum EnumSingleton {\n    INSTANCE;\n\n    public void someMethod() {\n        System.out.println(\"Метод EnumSingleton\");\n    }\n}"
+      }
+    ],
+    "comparison_table": {
+      "title": "Преимущества и недостатки различных реализаций",
+      "headers": ["Реализация", "Потокобезопасность", "Ленивая инициализация", "Простота реализации", "Производительность", "Защита от рефлексии/сериализации"],
+      "rows": [
+        ["Eager Initialization", "Да", "Нет", "Простая", "Высокая", "Частично"],
+        ["Lazy Initialization", "Нет", "Да", "Простая", "Высокая (но не потокобезопасна)", "Нет"],
+        ["Thread-Safe Singleton", "Да", "Да", "Простая", "Низкая (из-за синхронизации)", "Да"],
+        ["Double-Checked Locking", "Да", "Да", "Средняя", "Высокая", "Да"],
+        ["Bill Pugh Singleton", "Да", "Да", "Простая", "Высокая", "Частично"],
+        ["Enum Singleton", "Да", "Да", "Очень простая", "Высокая", "Полная"]
+      ]
+    },
+    "criticism": {
+      "title": "Почему Singleton антипаттерн?",
+      "points": [
+        "Глобальное состояние: создает скрытые зависимости и трудности в тестировании",
+        "Усложнение модульности и расширяемости",
+        "Нарушение принципа единственной ответственности",
+        "Проблемы с наследованием",
+        "Необходимость синхронизации в некоторых реализациях",
+        "Уязвимость к рефлексии и сериализации",
+        "Проблемы с управлением жизненным циклом",
+        "Нарушение принципов SOLID: Open/Closed Principle и Dependency Inversion Principle"
+      ]
+    },
+    "additional_info": {
+      "standard_library_example": "Нет встроенной реализации в стандартной библиотеке Java",
+      "literature_references": {
+        "book1": "Design Patterns with Java: Singleton",
+        "book2": "Введение в паттерны проектирования: Одиночка"
+      },
+      "articles": [
+        "Habr: Синглтон — корень всех зол"
+      ]
+    },
+    "sources": [
+      "Design Patterns with Java: Singleton",
+      "Введение в паттерны проектирования: Одиночка",
+      "Habr: Синглтон — корень всех зол"
+    ]
+  }
+}
