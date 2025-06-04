@@ -1,0 +1,93 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Состояние",
+      "en": "State"
+    },
+    "type": "Поведенческий паттерн проектирования",
+    "core_idea": "Паттерн Состояние позволяет объектам менять поведение в зависимости от своего состояния. Извне создаётся впечатление, что изменился класс объекта.",
+    "description": {
+      "main": "Паттерн разделяет функциональность объекта на отдельные классы, каждый из которых представляет определенное состояние. Контекст содержит ссылку на текущий объект-состояние и делегирует ему выполнение соответствующих действий.",
+      "detailed": "Паттерн схож с конечным автоматом и предназначен для избавления от множества if и switch операторов. Особенности поведения переносятся в класс состояния, убирая множественное ветвление.",
+      "bullets": [
+        "Задумайтесь об использовании Состояния там, где у вас много if и switch операторов"
+      ]
+    },
+    "usage_scenarios": [
+      "Объект должен изменять свое поведение в зависимости от состояния",
+      "При наличии сложных условных операторов в коде",
+      "Когда необходимо легко добавлять новые состояния",
+      "Для управления поведением, зависящим от внутренних условий объекта"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Context",
+          "description": "Класс, который содержит текущее состояние и делегирует ему работу",
+          "methods": [
+            "setState() - устанавливает текущее состояние",
+            "request() - вызывает методы текущего состояния"
+          ]
+        },
+        {
+          "name": "State",
+          "description": "Интерфейс состояний с методами для всех возможных действий",
+          "methods": []
+        },
+        {
+          "name": "ConcreteState",
+          "description": "Конкретные реализации состояний",
+          "methods": [
+            "Реализуют поведение для конкретного состояния",
+            "Могут изменять состояние контекста"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Реализация включает создание интерфейса состояний, конкретных классов состояний и контекста, который делегирует работу текущему состоянию.",
+      "steps": [
+        "Определите класс, который будет играть роль контекста",
+        "Создайте интерфейс состояний с общими методами",
+        "Реализуйте конкретные классы состояний",
+        "Добавьте в контекст поле для хранения текущего состояния",
+        "Замените условные операторы на вызовы методов состояния",
+        "Реализуйте логику переключения состояний"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример из стандартной Java библиотеки",
+        "description": "Thread.State как перечисление состояний потока",
+        "code": "public enum State {\n    NEW,\n    RUNNABLE,\n    BLOCKED,\n    WAITING,\n    TIMED_WAITING,\n    TERMINATED;\n}"
+      },
+      {
+        "name": "Игровая система с состояниями персонажа",
+        "description": "Полная реализация системы с состояниями Standing, Running, Jumping",
+        "code": "// Интерфейс состояния\npublic interface State {\n    void pressRun(Player player);\n    void pressJump(Player player);\n    void pressStop(Player player);\n}\n\n// Состояние - стоя\npublic class StandingState implements State {\n    @Override\n    public void pressRun(Player player) {\n        System.out.println(\"Player starts running.\");\n        player.setState(new RunningState());\n    }\n\n    @Override\n    public void pressJump(Player player) {\n        System.out.println(\"Player jumps.\");\n        player.setState(new JumpingState());\n    }\n\n    @Override\n    public void pressStop(Player player) {\n        System.out.println(\"Player is already standing.\");\n    }\n}\n\n// Состояние - бег\npublic class RunningState implements State {\n    @Override\n    public void pressRun(Player player) {\n        System.out.println(\"Player is already running.\");\n    }\n\n    @Override\n    public void pressJump(Player player) {\n        System.out.println(\"Player jumps while running.\");\n        player.setState(new JumpingState());\n    }\n\n    @Override\n    public void pressStop(Player player) {\n        System.out.println(\"Player stops running.\");\n        player.setState(new StandingState());\n    }\n}\n\n// Состояние - прыжок\npublic class JumpingState implements State {\n    @Override\n    public void pressRun(Player player) {\n        System.out.println(\"Player cannot run while jumping.\");\n    }\n\n    @Override\n    public void pressJump(Player player) {\n        System.out.println(\"Player is already jumping.\");\n    }\n\n    @Override\n    public void pressStop(Player player) {\n        System.out.println(\"Player lands and stands.\");\n        player.setState(new StandingState());\n    }\n}\n\n// Класс игрока (контекст)\npublic class Player {\n    private State currentState;\n\n    public Player() {\n        currentState = new StandingState();\n    }\n\n    public void setState(State state) {\n        this.currentState = state;\n    }\n\n    public void pressRun() {\n        currentState.pressRun(this);\n    }\n\n    public void pressJump() {\n        currentState.pressJump(this);\n    }\n\n    public void pressStop() {\n        currentState.pressStop(this);\n    }\n\n    public String getStateName() {\n        return currentState.getClass().getSimpleName();\n    }\n}\n\n// Демонстрация работы\npublic class Main {\n    public static void main(String[] args) {\n        Player player = new Player();\n        System.out.println(\"Initial State: \" + player.getStateName());\n\n        player.pressRun();\n        System.out.println(\"Current State: \" + player.getStateName());\n\n        player.pressJump();\n        System.out.println(\"Current State: \" + player.getStateName());\n\n        player.pressRun(); // Попытка бегать во время прыжка\n        System.out.println(\"Current State: \" + player.getStateName());\n\n        player.pressStop();\n        System.out.println(\"Current State: \" + player.getStateName());\n\n        player.pressStop(); // Попытка остановиться, когда уже стоишь\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Светофор, который меняет свое состояние (красный, желтый, зеленый) и поведение",
+      "Плеер, который по-разному реагирует на кнопки в зависимости от текущего режима (воспроизведение, пауза, остановка)"
+    ],
+    "pros": [
+      "Упрощение кода за счет избавления от сложных условных операторов",
+      "Гибкость и легкость добавления новых состояний",
+      "Снижение связанности между компонентами",
+      "Четкое разделение ответственности между классами",
+      "Возможность динамического изменения поведения объекта"
+    ],
+    "cons": [
+      "Увеличение числа классов в системе",
+      "Сложность отладки из-за распределенной логики",
+      "Необходимость тщательного проектирования переходов между состояниями",
+      "Может быть избыточным для простых случаев с малым числом состояний"
+    ],
+    "conclusion": "Паттерн Состояние (State) предоставляет мощный способ управления поведением объектов в зависимости от их внутреннего состояния. Он улучшает гибкость и расширяемость системы, позволяя легко добавлять новые состояния и изменять поведение без изменения основного кода контекста.",
+    "sources": [
+      "Design Patterns: Elements of Reusable Object-Oriented Software by Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+      "Head First Design Patterns by Eric Freeman, Elisabeth Robson"
+    ]
+  }
+}

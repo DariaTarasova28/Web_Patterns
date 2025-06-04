@@ -1,0 +1,86 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Снимок",
+      "en": "Memento"
+    },
+    "type": "Поведенческий паттерн проектирования",
+    "core_idea": "Паттерн Снимок позволяет делать снимки состояния объектов, не раскрывая подробностей их реализации, а затем использовать их для восстановления прошлого состояния объектов.",
+    "description": {
+      "main": "Паттерн Снимок отделяет объект, сохраняющий состояние (Снимок), от объекта, чей статус сохраняется (Происхождение).",
+      "detailed": "Происхождение может создавать Снимки для сохранения своего состояния и затем использовать их для восстановления без раскрытия внутренней структуры.",
+      "bullets": []
+    },
+    "usage_scenarios": [
+      "Необходимо сохранить предыдущее состояние объекта",
+      "Требуется реализовать журнал или историю изменений",
+      "Нужно сохранять состояние объекта без нарушения инкапсуляции"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Originator",
+          "description": "Объект, состояние которого нужно сохранять",
+          "methods": [
+            "save() - создает снимок текущего состояния",
+            "restore() - восстанавливает состояние из снимка"
+          ]
+        },
+        {
+          "name": "Memento",
+          "description": "Снимок состояния Originator",
+          "methods": [
+            "Должен быть неизменяемым",
+            "Содержит только данные состояния"
+          ]
+        },
+        {
+          "name": "Caretaker",
+          "description": "Управляет историей снимков",
+          "methods": [
+            "saveState() - сохраняет текущее состояние",
+            "restoreState() - восстанавливает предыдущее состояние"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Реализация включает создание классов Originator, Memento и Caretaker с методами для сохранения и восстановления состояний.",
+      "steps": [
+        "Определите класс Originator с методами save() и restore()",
+        "Создайте класс Memento для хранения состояния",
+        "Реализуйте класс Caretaker для управления историей состояний",
+        "Сделайте класс Memento неизменяемым",
+        "Обеспечьте безопасное хранение и восстановление состояний"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример с сохранением состояния игры",
+        "description": "Полная реализация системы сохранения состояния игрового объекта",
+        "code": "// Originator\npublic class Game {\n    protected int playerPosition;\n    protected int score;\n\n    public void movePlayer(int newPosition) {\n        playerPosition = newPosition;\n        System.out.println(\"Player moved to position: \" + playerPosition);\n    }\n\n    public void addScore(int points) {\n        score += points;\n        System.out.println(\"Score increased by \" + points + \". Current score: \" + score);\n    }\n\n    public GameState save() {\n        System.out.println(\"Saving game state: Position=\" + playerPosition + \", Score=\" + score);\n        return new GameState(playerPosition, score);\n    }\n\n    public void restore(GameState state) {\n        playerPosition = state.getPlayerPosition();\n        score = state.getScore();\n        System.out.println(\"Game state restored: Position=\" + playerPosition + \", Score=\" + score);\n    }\n}\n\n// Memento\npublic class GameState {\n    private final int playerPosition;\n    private final int score;\n\n    public GameState(int playerPosition, int score) {\n        this.playerPosition = playerPosition;\n        this.score = score;\n    }\n\n    public int getPlayerPosition() {\n        return playerPosition;\n    }\n\n    public int getScore() {\n        return score;\n    }\n}\n\n// Caretaker\nimport java.util.ArrayDeque;\nimport java.util.Deque;\n\npublic class GameSaveManager {\n    private Deque<GameState> saveStack = new ArrayDeque<>();\n\n    public void saveState(Game game) {\n        saveStack.push(game.save());\n    }\n\n    public void restoreState(Game game) {\n        if (!saveStack.isEmpty()) {\n            GameState state = saveStack.pop();\n            game.restore(state);\n        } else {\n            System.out.println(\"No saved states to restore.\");\n        }\n    }\n}\n\n// Main class\npublic class Main {\n    public static void main(String[] args) {\n        Game game = new Game();\n        GameSaveManager saveManager = new GameSaveManager();\n\n        game.movePlayer(10);\n        game.addScore(50);\n        saveManager.saveState(game);\n\n        game.movePlayer(20);\n        game.addScore(30);\n        saveManager.saveState(game);\n\n        game.movePlayer(30);\n        game.addScore(20);\n        System.out.println(\"Current Game State: Position=\" + game.playerPosition + \", Score=\" + game.score);\n\n        System.out.println(\"\\nRestoring to last saved state:\");\n        saveManager.restoreState(game);\n        System.out.println(\"Game State after restoration: Position=\" + game.playerPosition + \", Score=\" + game.score);\n\n        System.out.println(\"\\nRestoring to previous saved state:\");\n        saveManager.restoreState(game);\n        System.out.println(\"Game State after restoration: Position=\" + game.playerPosition + \", Score=\" + game.score);\n\n        System.out.println(\"\\nAttempting to restore beyond history:\");\n        saveManager.restoreState(game);\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Система контроля версий (например, Git), которая сохраняет состояния проекта",
+      "Функция 'Отменить' в текстовом редакторе"
+    ],
+    "pros": [
+      "Легкость реализации механизмов отмены и повторения",
+      "Гибкость управления историей состояний",
+      "Сохранение инкапсуляции объектов",
+      "Возможность повторного использования снимков"
+    ],
+    "cons": [
+      "Увеличение использования памяти",
+      "Сложность реализации",
+      "Необходимость управления жизненным циклом состояний"
+    ],
+    "conclusion": "Паттерн Снимок (Memento) является мощным инструментом для управления состоянием объектов, особенно когда требуется реализовать механизмы отмены и восстановления. Он позволяет сохранять состояние объекта без раскрытия его внутренней структуры, обеспечивая при этом гибкость и расширяемость системы.",
+    "sources": [
+      "Baeldung: Memento Design Pattern in Java",
+      "Design Patterns with Java: Memento",
+      "Введение в паттерны проектирования: Снимок"
+    ]
+  }
+}

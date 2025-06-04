@@ -1,0 +1,115 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Посетитель",
+      "en": "Visitor"
+    },
+    "type": "Поведенческий паттерн проектирования",
+    "core_idea": "Паттерн Посетитель позволяет определить новую операцию без изменения классов объектов, над которыми эта операция будет выполняться. Это достигается путем добавления метода accept в иерархию объектов, который принимает посетителя и вызывает соответствующий метод у него.",
+    "description": {
+      "main": "Посетитель — это поведенческий паттерн проектирования, который позволяет создавать новые операции, не меняя классы объектов, над которыми эти операции могут выполняться.",
+      "detailed": "Паттерн хороший, но имеет неприятный краевой случай про который буде описано далее.",
+      "bullets": []
+    },
+    "usage_scenarios": [
+      "Когда вам нужно выполнить операцию над всеми элементами сложной структуры объектов (например, деревом).",
+      "Когда над объектами сложной структуры объектов надо выполнять некоторые, не связанные между собой операций, но вы не хотите «засорять» классы такими операциями.",
+      "Когда новое поведение имеет смысл только для некоторых классов из существующей иерархии."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Visitor",
+          "description": "Интерфейс посетителя с методами посещения для каждого типа элементов",
+          "methods": [
+            "visitCircle(Circle circle)",
+            "visitRectangle(Rectangle rectangle)"
+          ]
+        },
+        {
+          "name": "Element",
+          "description": "Интерфейс элементов, которые могут принимать посетителей",
+          "methods": [
+            "accept(Visitor visitor)"
+          ]
+        },
+        {
+          "name": "Concrete Elements",
+          "description": "Конкретные классы элементов (Circle, Rectangle и др.)",
+          "methods": [
+            "accept(Visitor visitor) - реализация метода принятия посетителя"
+          ]
+        },
+        {
+          "name": "Concrete Visitor",
+          "description": "Конкретные реализации посетителей (PrintVisitor и др.)",
+          "methods": [
+            "visitCircle(Circle circle) - реализация операции для круга",
+            "visitRectangle(Rectangle rectangle) - реализация операции для прямоугольника"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Паттерн реализуется через механизм двойной диспетчеризации, где элементы принимают посетителей и делегируют им выполнение операций.",
+      "steps": [
+        "Создайте интерфейс посетителя и объявите в нём методы «посещения» для каждого класса компонента",
+        "Опишите интерфейс компонентов с методом принятия посетителей",
+        "Реализуйте методы принятия во всех конкретных компонентах",
+        "Для каждого нового поведения создайте свой конкретный класс посетителя",
+        "Клиент создает объекты посетителей и передает их компонентам через метод accept"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Интерфейсы Visitor и Element",
+        "description": "Базовые интерфейсы для реализации паттерна",
+        "code": "public interface Visitor {\n    void visitCircle(Circle circle);\n\n    void visitRectangle(Rectangle rectangle);\n}\n\npublic interface Element {\n    void accept(Visitor visitor);\n}"
+      },
+      {
+        "name": "Классы Circle и Rectangle",
+        "description": "Конкретные элементы, реализующие интерфейс Element",
+        "code": "public class Circle implements Element {\n    private double radius;\n\n    public Circle(double radius) {\n        this.radius = radius;\n    }\n\n    public double getRadius() {\n        return radius;\n    }\n\n    @Override\n    public void accept(Visitor visitor) {\n        visitor.visitCircle(this);\n    }\n}\n\npublic class Rectangle implements Element {\n    private double width;\n    private double height;\n\n    public Rectangle(double width, double height) {\n        this.width = width;\n        this.height = height;\n    }\n\n    public double getWidth() {\n        return width;\n    }\n\n    public double getHeight() {\n        return height;\n    }\n\n    @Override\n    public void accept(Visitor visitor) {\n        visitor.visitRectangle(this);\n    }\n}"
+      },
+      {
+        "name": "Класс PrintVisitor",
+        "description": "Конкретная реализация посетителя для печати информации о фигурах",
+        "code": "public class PrintVisitor implements Visitor {\n    @Override\n    public void visitCircle(Circle circle) {\n        System.out.println(\"Circle with radius: \" + circle.getRadius());\n    }\n\n    @Override\n    public void visitRectangle(Rectangle rectangle) {\n        System.out.println(\"Rectangle with width: \" + rectangle.getWidth() +\n                \" and height: \" + rectangle.getHeight());\n    }\n}"
+      },
+      {
+        "name": "Пример использования",
+        "description": "Клиентский код, демонстрирующий работу паттерна",
+        "code": "public class Main {\n    public static void main(String[] args) {\n        List<Element> shapes = List.of(\n                new Circle(5.0),\n                new Rectangle(4.0, 6.0),\n                new Circle(3.5),\n                new Rectangle(2.0, 3.0)\n        );\n\n        PrintVisitor printer = new PrintVisitor();\n\n        for (Element shape : shapes) {\n            shape.accept(printer);\n        }\n    }\n}"
+      },
+      {
+        "name": "Краевой случай",
+        "description": "Пример с классами, недоступными для изменения",
+        "code": "foreach (Node node : graph)\n    if (node instanceof Type1)\n        exportVisitor.doForType1((Type1) node);\n    if (node instanceof Type2)\n        exportVisitor.doForType2((Type2) node);"
+      }
+    ],
+    "analogies": [
+      "Как экскурсовод в музее, который может рассказать о каждом экспонате по-разному (на разных языках, с разным уровнем детализации), не изменяя сами экспонаты."
+    ],
+    "pros": [
+      "Упрощает добавление новых операций над всей связанной структурой объектов.",
+      "Объединяет родственные операции в одном классе.",
+      "Посетитель может накоплять состояние при обходе структуры компонентов."
+    ],
+    "cons": [
+      "Паттерн неоправдан, если иерархия компонентов часто меняется.",
+      "Может привести к нарушению инкапсуляции компонентов.",
+      "Сложная реализация если классы компонентов не доступны для изменения."
+    ],
+    "comparison": {
+      "title": "Сравнение с другими паттернами",
+      "items": [
+        {
+          "name": "Итератор",
+          "description": "Итератор задает порядок обхода элемента и предоставляет клиентскому коду возможность воспользоваться этим обходом. Посетитель никак не связан с порядком обхода - его суть в выполнении действий с элементами. Паттерны могут хорошо работать вместе, когда Итератор задает порядок обхода, а Посетитель выполняет действия над данными."
+        }
+      ]
+    },
+    "conclusion": "Паттерн Посетитель (Visitor) предоставляет мощный способ разделения алгоритмов и объектов, над которыми они выполняются. Он особенно полезен при работе со сложными структурами объектов, позволяя легко добавлять новые операции без изменения их классов. Однако, как и любой паттерн, он имеет свои преимущества и недостатки, и его применение должно быть обосновано конкретными требованиями проекта.",
+    "sources": []
+  }
+}

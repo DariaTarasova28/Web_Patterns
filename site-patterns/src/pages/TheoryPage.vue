@@ -34,27 +34,27 @@ export default {
         {
           title: 'Структурные паттерны',
           children: [
-            { title: 'Composite', file: 'Composite.json' },
-            { title: 'Facade', file: 'Facade.json' },
-            { title: 'Bridge', file: 'Bridge.json' },
-            { title: 'Adapter', file: 'Adapter.json' },
+            { title: 'Composite', file: 'composit.json' },
+            { title: 'Facade', file: 'facade.json' },
+            { title: 'Bridge', file: 'bridge.json' },
+            { title: 'Adapter', file: 'adapter.json' },
             { title: 'Proxy', file: 'proxy.json' },
             { title: 'Decorator', file: 'decorator.json' },
-            { title: 'Flyweight', file: 'Flyweight.json' }
+            { title: 'Flyweight', file: 'flyweight.json' }
           ]
         },
         {
           title: 'Поведенческие паттерны',
           children: [
-            { title: 'Chain', file: 'Chain.json' },
-            { title: 'Strategy', file: 'Strategy.json' },
-            { title: 'Command', file: 'Command.json' },
-            { title: 'State', file: 'State.json' },
-            { title: 'Memento', file: 'Memento.json' },
-            { title: 'Iterator', file: 'Iterator.json' },
-            { title: 'Visitor', file: 'Visitor.json' },
-            { title: 'Mediator', file: 'Mediator.json' },
-            { title: 'Observer', file: 'Observer.json' }
+            { title: 'Chain', file: 'chain.json' },
+            { title: 'Strategy', file: 'strategy.json' },
+            { title: 'Command', file: 'command.json' },
+            { title: 'State', file: 'state.json' },
+            { title: 'Memento', file: 'memento.json' },
+            { title: 'Iterator', file: 'iterator.json' },
+            { title: 'Visitor', file: 'visitor.json' },
+            { title: 'Mediator', file: 'mediator.json' },
+            { title: 'Observer', file: 'observer.json' }
           ]
         }
       ]

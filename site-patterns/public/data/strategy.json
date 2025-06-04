@@ -1,0 +1,112 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Стратегия",
+      "en": "Strategy"
+    },
+    "type": "Поведенческий",
+    "core_idea": "Паттерн Стратегия позволяет определить набор взаимозаменяемых алгоритмов, помещая их в отдельные классы, и делать их взаимозаменяемыми во время выполнения программы. Это достигается путем использования интерфейса или абстрактного класса, который определяет общий метод для всех алгоритмов.",
+    "description": {
+      "main": "Паттерн Стратегия (Strategy) — это поведенческий паттерн проектирования, который определяет семейство алгоритмов, инкапсулирует каждый из них и делает их взаимозаменяемыми.",
+      "detailed": "Стратегия позволяет изменять алгоритмы независимо от клиентов, которые ими пользуются.",
+      "bullets": [
+        "Инкапсулирует алгоритмы в отдельные классы.",
+        "Позволяет изменять поведение во время выполнения.",
+        "Избавляет от множества условных операторов в коде.",
+        "Слабо связывает контекст и конкретную реализацию."
+      ]
+    },
+    "usage_scenarios": [
+      "Необходимо выбрать один из нескольких алгоритмов в зависимости от условий во время выполнения.",
+      "Алгоритмы часто изменяются или расширяются.",
+      "Необходимо избежать множественных условных операторов (if, switch) для выбора алгоритма.",
+      "Хотите обеспечить повторное использование алгоритмов независимо от контекста."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Strategy",
+          "description": "Общий интерфейс для всех конкретных стратегий.",
+          "methods": ["sort(List<String> items)"]
+        },
+        {
+          "name": "ConcreteStrategy",
+          "description": "Конкретная реализация алгоритма.",
+          "methods": ["sort(List<String> items) // разная логика сортировки"]
+        },
+        {
+          "name": "Context",
+          "description": "Хранит ссылку на стратегию и делегирует ей выполнение.",
+          "methods": [
+            "setStrategy(SortStrategy strategy)",
+            "sort(List<String> items)"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Определите алгоритм, который подвержен изменениям, и вынесите его в интерфейс. Затем создайте классы, реализующие различные вариации этого алгоритма, и используйте их в клиентском коде через объект контекста.",
+      "steps": [
+        "Определите интерфейс стратегий с общим методом.",
+        "Создайте классы, реализующие различные алгоритмы.",
+        "Внедрите стратегию в класс-контекст.",
+        "Реализуйте метод установки стратегии.",
+        "Клиент задаёт нужную стратегию в зависимости от ситуации."
+      ]
+    },
+    "examples": [
+      {
+        "name": "SortStrategy интерфейс",
+        "description": "Определяет метод сортировки для всех стратегий.",
+        "code": "public interface SortStrategy {\n    void sort(List<String> items);\n}"
+      },
+      {
+        "name": "AscendingSort",
+        "description": "Конкретная стратегия сортировки по возрастанию.",
+        "code": "public class AscendingSort implements SortStrategy {\n    @Override\n    public void sort(List<String> items) {\n        Collections.sort(items);\n        System.out.println(\"Сортировка по возрастанию: \" + items);\n    }\n}"
+      },
+      {
+        "name": "DescendingSort",
+        "description": "Конкретная стратегия сортировки по убыванию.",
+        "code": "public class DescendingSort implements SortStrategy {\n    @Override\n    public void sort(List<String> items) {\n        Collections.sort(items, Comparator.reverseOrder());\n        System.out.println(\"Сортировка по убыванию: \" + items);\n    }\n}"
+      },
+      {
+        "name": "LengthSort",
+        "description": "Конкретная стратегия сортировки по длине строки.",
+        "code": "public class LengthSort implements SortStrategy {\n    @Override\n    public void sort(List<String> items) {\n        items.sort(Comparator.comparingInt(String::length));\n        System.out.println(\"Сортировка по длине: \" + items);\n    }\n}"
+      },
+      {
+        "name": "Контекст — Sorter",
+        "description": "Контекст использует стратегию для выполнения сортировки.",
+        "code": "public class Sorter {\n    private SortStrategy strategy;\n\n    public void setStrategy(SortStrategy strategy) {\n        this.strategy = strategy;\n    }\n\n    public void sort(List<String> items) {\n        if (Objects.isNull(strategy)) throw new IllegalStateException(\"SortStrategy не установлена.\");\n        strategy.sort(items);\n    }\n}"
+      },
+      {
+        "name": "Main",
+        "description": "Демонстрация работы с различными стратегиями.",
+        "code": "public class Main {\n    public static void main(String[] args) {\n        Sorter sorter = new Sorter();\n        List<String> items = Stream.of(\"яблоко\", \"банан\", \"киви\", \"апельсин\", \"груша\")\n                .collect(Collectors.toList());\n\n        sorter.setStrategy(new AscendingSort());\n        sorter.sort(items);\n\n        sorter.setStrategy(new DescendingSort());\n        sorter.sort(items);\n\n        sorter.setStrategy(new LengthSort());\n        sorter.sort(items);\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Навигация на автомобиле: выбор между маршрутами — самый быстрый, кратчайший, без платных дорог.",
+      "Разные способы оплаты: наличные, карта, перевод — выбирается нужная стратегия."
+    ],
+    "pros": [
+      "Гибкость: легко подменять алгоритмы во время выполнения.",
+      "Расширяемость: легко добавлять новые алгоритмы без изменения существующего кода.",
+      "Повторное использование: стратегии можно использовать в разных частях программы.",
+      "Снижение связанности: контекст не зависит от реализации алгоритма."
+    ],
+    "cons": [
+      "Увеличение количества классов: на каждую стратегию требуется отдельный класс.",
+      "Усложнение кода: может быть сложно управлять большим числом стратегий.",
+      "Потенциальные накладные расходы: особенно при частой смене стратегий."
+    ],
+    "fluent_interface": "Иногда стратегии могут быть установлены через fluent-интерфейс, например: `sorter.setStrategy(new AscendingSort()).sort(items);`",
+    "conclusion": "Паттерн Стратегия помогает инкапсулировать поведение и менять его независимо от клиента. Это отличный выбор, если в программе нужно поддерживать несколько вариантов поведения или алгоритмов.",
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/strategy",
+      "https://en.wikipedia.org/wiki/Strategy_pattern",
+      "Head First Design Patterns, Freeman"
+    ]
+  }
+}

@@ -87,21 +87,6 @@
         "Не всегда улучшает производительность для простых объектов"
       ]
     },
-    "additional_info": {
-      "standard_library_example": "Java: java.util.concurrent.ThreadPoolExecutor, Apache Commons Pool",
-      "literature_references": {
-        "book1": "Design Patterns: Elements of Reusable Object-Oriented Software",
-        "book2": "Java Concurrency in Practice"
-      },
-      "articles": [
-        "Habr: Паттерн Object Pool и его реализация",
-        "Medium: Object Pool Design Pattern in Java"
-      ]
-    },
-    "sources": [
-      "Design Patterns: Elements of Reusable Object-Oriented Software",
-      "Java Concurrency in Practice",
-      "Apache Commons Pool Documentation"
-    ]
+    "conclusion": "Паттерн Object Pool представляет собой мощный инструмент для оптимизации работы с ограниченными или дорогими ресурсами. Он особенно эффективен в системах с высокой нагрузкой и многократным созданием однотипных объектов, где важна производительность. Однако его использование должно быть обоснованным, так как управление пулом и состоянием объектов добавляет сложности. При правильной реализации паттерн помогает достичь высокой эффективности и устойчивости системы."
   }
 }

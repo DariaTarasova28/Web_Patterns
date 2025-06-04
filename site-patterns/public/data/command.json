@@ -1,0 +1,99 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Команда",
+      "en": "Command"
+    },
+    "type": "Поведенческий паттерн проектирования",
+    "core_idea": "Паттерн \"Команда\" превращает запросы в объекты, позволяя передавать их как аргументы при вызове методов, ставить запросы в очередь, логировать их, а также поддерживать отмену операций.",
+    "description": {
+      "main": "Паттерн \"Команда\" разделяет объект, инициирующий запрос, от объектов, которые его выполняют. Это достигается путем создания отдельных объектов-команд, каждая из которых реализует определенное действие.",
+      "bullets": []
+    },
+    "usage_scenarios": [
+      "Необходимо параметризовать объекты с операциями",
+      "Требуется поддержка отмены и повторного выполнения операций",
+      "Необходимо организовать очередь запросов или логи действий",
+      "Требуется разделить инициирующий объект и объект, выполняющий действие"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Command",
+          "description": "Интерфейс команд с методом выполнения",
+          "methods": [
+            "execute() - метод выполнения команды",
+            "undo() - метод отмены команды (опционально)"
+          ]
+        },
+        {
+          "name": "ConcreteCommand",
+          "description": "Конкретные реализации команд",
+          "methods": [
+            "Хранит ссылки на получателя",
+            "Реализует методы execute() и undo()"
+          ]
+        },
+        {
+          "name": "Invoker",
+          "description": "Инициатор команд",
+          "methods": [
+            "Хранит и выполняет команды",
+            "Может поддерживать историю команд"
+          ]
+        },
+        {
+          "name": "Receiver",
+          "description": "Объект, который выполняет основную работу",
+          "methods": [
+            "Содержит бизнес-логику",
+            "Выполняет действия по запросу команд"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Реализация паттерна включает создание интерфейса команд, конкретных классов команд, получателей и инициаторов.",
+      "steps": [
+        "Создайте общий интерфейс команд и определите в нём метод запуска",
+        "Создайте классы конкретных команд с полями для хранения ссылок на объекты-получатели",
+        "Добавьте в классы отправителей поля для хранения команд",
+        "Измените основной код отправителей для делегирования выполнения команде"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример из стандартной библиотеки Java",
+        "description": "Интерфейс Runnable как реализация паттерна \"Команда\"",
+        "code": "public class RunnableExample {\n    public static void main(String[] args) {\n        Runnable task = new Runnable() {\n            @Override\n            public void run() {\n                System.out.println(\"Task is running in a separate thread.\");\n            }\n        };\n\n        Thread thread = new Thread(task);\n        thread.start();\n    }\n}"
+      },
+      {
+        "name": "Текстовый редактор с поддержкой отмены",
+        "description": "Реализация системы с командами вставки и удаления текста",
+        "code": "// Интерфейс Command\npublic interface Command {\n    void execute();\n    void undo();\n}\n\n// Получатель\npublic class TextEditor {\n    private StringBuilder text = new StringBuilder();\n\n    public void insert(int position, String content) {\n        text.insert(position, content);\n    }\n\n    public void delete(int position, int length) {\n        text.delete(position, position + length);\n    }\n}\n\n// Конкретная команда\npublic class InsertCommand implements Command {\n    private TextEditor editor;\n    private int position;\n    private String content;\n\n    public InsertCommand(TextEditor editor, int position, String content) {\n        this.editor = editor;\n        this.position = position;\n        this.content = content;\n    }\n\n    @Override\n    public void execute() {\n        editor.insert(position, content);\n    }\n\n    @Override\n    public void undo() {\n        editor.delete(position, content.length());\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Официант в ресторане (Invoker) принимает заказы (Command) от клиентов и передает их повару (Receiver)",
+      "Дистанционный пульт (Invoker) с кнопками (Command), которые управляют устройствами (Receiver)"
+    ],
+    "pros": [
+      "Снижение связанности между компонентами",
+      "Гибкость и расширяемость системы",
+      "Поддержка отмены и повтора операций",
+      "Возможность организации очереди команд",
+      "Реализация сложных составных команд"
+    ],
+    "cons": [
+      "Увеличение числа классов в системе",
+      "Сложность отладки из-за распределенной логики",
+      "Избыточность для простых систем"
+    ],
+    "fluent_interface": "Паттерн \"Команда\" часто используется совместно с Fluent Interface для создания удобного API, где методы можно вызывать цепочкой.",
+    "conclusion": "Паттерн Команда (Command) является мощным инструментом для инкапсуляции запросов как объектов, что обеспечивает гибкость, расширяемость и упрощает управление действиями в системе. Он широко применяется в различных областях, таких как системы управления устройствами, GUI-приложения, системы логирования и многие другие.",
+    "sources": [
+      "Design Patterns: Elements of Reusable Object-Oriented Software by Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+      "Head First Design Patterns by Eric Freeman, Elisabeth Robson"
+    ]
+  }
+}

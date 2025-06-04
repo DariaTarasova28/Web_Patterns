@@ -1,0 +1,106 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Легковес",
+      "en": "Flyweight"
+    },
+    "type": "Структурный паттерн проектирования",
+    "core_idea": "Основная идея паттерна Легковес заключается в разделении состояния объекта на внутреннее (shared) и внешнее (unshared). Внутреннее состояние хранится в одном экземпляре и разделяется между всеми объектами, а внешнее состояние передаётся клиенту и хранится отдельно.",
+    "description": {
+      "main": "Легковес — это структурный паттерн проектирования, который позволяет вместить бóльшее количество объектов в отведённую оперативной память за счёт экономного разделения общего состояния объектов между собой, вместо хранения одинаковых данных в каждом объекте.",
+      "detailed": "В разработке программного обеспечения часто сталкиваются с задачами управления большим количеством объектов, которые могут иметь схожие характеристики. Это приводит к увеличению потребления памяти и снижению производительности системы. Структурный паттерн проектирования Легковес (Flyweight) предоставляет решение этой проблемы, позволяя эффективно использовать память за счёт разделения общих (внутренних) и уникальных (внешних) данных объектов.",
+      "bullets": [
+        "Разделение состояния объекта на внутреннее (shared) и внешнее (unshared).",
+        "Внутреннее состояние хранится и разделяется между объектами.",
+        "Внешнее состояние передаётся клиенту и хранится отдельно.",
+        "Экономия памяти за счёт повторного использования общих данных.",
+        "Увеличение производительности за счёт уменьшения количества создаваемых объектов."
+      ]
+    },
+    "usage_scenarios": [
+      "Необходимо создать большое количество мелких объектов, расходующих много памяти.",
+      "Объекты могут иметь общие части состояния, которые могут быть разделены между ними.",
+      "Хотите уменьшить количество создаваемых объектов для повышения производительности.",
+      "Требуется обеспечить разделение внутреннего и внешнего состояния объектов."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Flyweight",
+          "description": "Интерфейс легковеса, объявляющий операции, которые принимают внешнее состояние.",
+          "methods": ["operation(extrinsicState)"]
+        },
+        {
+          "name": "ConcreteFlyweight",
+          "description": "Реализует интерфейс Flyweight и хранит внутреннее состояние, которое должно быть неизменяемым.",
+          "methods": ["operation(extrinsicState)"]
+        },
+        {
+          "name": "FlyweightFactory",
+          "description": "Создаёт и управляет легковесами, обеспечивает кеширование и повторное использование объектов.",
+          "methods": ["getFlyweight(key)"]
+        },
+        {
+          "name": "Client",
+          "description": "Хранит внешнее состояние и передаёт его легковесу при вызове операций."
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Разделите поля класса, который станет легковесом, на внутреннее и внешнее состояние. Внутреннее состояние хранится в легковесе, внешнее — передаётся через методы. Создайте фабрику для управления кешированием и созданием объектов легковесов.",
+      "steps": [
+        "Разделить состояние объекта на внутреннее (shared) и внешнее (unshared).",
+        "Внутреннее состояние сделать неизменяемым и хранить в объекте легковеса.",
+        "Внешнее состояние передавать в методы легковеса как параметры.",
+        "Создать фабрику для создания и кеширования объектов легковесов.",
+        "Клиенты запрашивают легковесы через фабрику и управляют внешним состоянием."
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пул строк в Java",
+        "description": "Пул строк обеспечивает повторное использование строковых литералов, уменьшая потребление памяти.",
+        "code": null
+      },
+      {
+        "name": "Кэширование объектов Integer в Java",
+        "description": "Для значений от -128 до 127 объекты Integer кэшируются и повторно используются.",
+        "code": null
+      },
+      {
+        "name": "Класс Color в java.awt",
+        "description": "Объекты стандартных цветов повторно используются для экономии памяти.",
+        "code": null
+      },
+      {
+        "name": "Пример Flyweight для текстового редактора",
+        "description": "Реализация интерфейса CharacterFlyweight, фабрики и контекста символа.",
+        "code": "public interface CharacterFlyweight {\n    void display(CharacterContext context);\n}\n\npublic class ConcreteCharacterFlyweight implements CharacterFlyweight {\n    private final char character;\n    private final String font;\n    private final int size;\n\n    public ConcreteCharacterFlyweight(char character, String font, int size) {\n        this.character = character;\n        this.font = font;\n        this.size = size;\n    }\n\n    @Override\n    public void display(CharacterContext context) {\n        System.out.println(\"Character: \" + character + \", Font: \" + font + \", Size: \" + size +\n                \", Position: (\" + context.getX() + \", \" + context.getY() + \")\");\n    }\n}\n\nimport java.util.HashMap;\nimport java.util.Map;\n\npublic class CharacterFlyweightFactory {\n    private static final Map<String, CharacterFlyweight> flyweights = new HashMap<>();\n\n    public static CharacterFlyweight getCharacter(char character, String font, int size) {\n        String key = character + \"-\" + font + \"-\" + size;\n        if (!flyweights.containsKey(key)) {\n            flyweights.put(key, new ConcreteCharacterFlyweight(character, font, size));\n            System.out.println(\"Creating new Flyweight for: \" + key);\n        }\n        return flyweights.get(key);\n    }\n\n    public static int getFlyweightCount() {\n        return flyweights.size();\n    }\n}\n\npublic class CharacterContext {\n    private final int x;\n    private final int y;\n\n    public CharacterContext(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n\n    public int getX() { return x; }\n    public int getY() { return y; }\n}\n\npublic class FlyweightPatternMain {\n    public static void main(String[] args) {\n        String text = \"HELLO HELLO\";\n        String font = \"Arial\";\n        int size = 12;\n\n        int x = 0;\n        int y = 0;\n\n        for (char c : text.toCharArray()) {\n            CharacterFlyweight flyweight = CharacterFlyweightFactory.getCharacter(c, font, size);\n            CharacterContext context = new CharacterContext(x, y);\n            flyweight.display(context);\n            x += 10;\n        }\n\n        System.out.println(\"Total Flyweight objects created: \" + CharacterFlyweightFactory.getFlyweightCount());\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Пул строк в Java — аналог кэширования и повторного использования объектов.",
+      "Цвета в графических библиотеках — повторное использование стандартных объектов.",
+      "Общие ресурсы в операционных системах, разделяемые между процессами."
+    ],
+    "pros": [
+      "Экономия памяти за счёт повторного использования объектов.",
+      "Повышение производительности системы.",
+      "Гибкость добавления новых типов без изменения существующего кода.",
+      "Централизованное управление объектами через фабрику."
+    ],
+    "cons": [
+      "Сложность реализации и поддержки кэша объектов.",
+      "Необходимость четкого разделения внутреннего и внешнего состояния.",
+      "Проблемы синхронизации в многопоточных приложениях."
+    ],
+    "fluent_interface": null,
+    "conclusion": "Паттерн проектирования Легковес является эффективным инструментом для оптимизации использования памяти и повышения производительности приложений, особенно при работе с большим количеством схожих объектов. Правильное применение паттерна способствует созданию масштабируемых и эффективных систем.",
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/flyweight",
+      "https://ru.wikipedia.org/wiki/Легковес_(шаблон_проектирования)",
+      "https://www.baeldung.com/java-flyweight-pattern"
+    ]
+  }
+}
+

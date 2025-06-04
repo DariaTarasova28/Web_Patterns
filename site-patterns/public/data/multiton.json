@@ -5,9 +5,15 @@
       "en": "Multiton"
     },
     "type": "Порождающий паттерн проектирования",
+    "core_idea": "Мультитон гарантирует существование ограниченного набора экземпляров класса, каждый из которых ассоциирован с уникальным ключом.",
     "description": {
       "main": "Мультитон — это порождающий паттерн проектирования, который представляет собой расширение паттерна Синглтон, позволяющее управлять созданием нескольких экземпляров класса, каждый из которых ассоциирован с уникальным ключом.",
-      "detailed": "Паттерн Мультитон управляет созданием и доступом к нескольким экземплярам класса, каждый из которых идентифицируется уникальным ключом. В отличие от Синглтона, который гарантирует существование только одного экземпляра класса, Мультитон позволяет создавать ограниченное число экземпляров, доступных по определённым идентификаторам. Это полезно для управления ресурсами, такими как соединения с разными базами данных или настройки для различных регионов."
+      "detailed": "Паттерн Мультитон управляет созданием и доступом к нескольким экземплярам класса, каждый из которых идентифицируется уникальным ключом. В отличие от Синглтона, который гарантирует существование только одного экземпляра класса, Мультитон позволяет создавать ограниченное число экземпляров, доступных по определённым идентификаторам. Это полезно для управления ресурсами, такими как соединения с разными базами данных или настройки для различных регионов.",
+      "bullets": [
+        "Гарантирует уникальность экземпляра по ключу.",
+        "Использует коллекцию (чаще всего `Map`) для хранения объектов.",
+        "Обеспечивает централизованное управление объектами с учётом их идентификаторов."
+      ]
     },
     "usage_scenarios": [
       "Необходимость управления ограниченным набором экземпляров класса (например, соединения к различным базам данных)",
@@ -15,89 +21,63 @@
       "Управление ресурсами с избеганием создания избыточных объектов",
       "Гарантия согласованности данных в рамках определённого контекста"
     ],
+    "structure": {
+      "components": [
+        {
+          "name": "Multiton",
+          "description": "Класс, управляющий экземплярами по ключу.",
+          "methods": [
+            "private constructor() — закрывает прямой доступ к созданию экземпляров.",
+            "public static getInstance(key) — возвращает экземпляр, связанный с ключом.",
+            "private static Map instances — хранилище всех созданных объектов."
+          ]
+        }
+      ]
+    },
     "implementation": {
       "general": "Реализация Мультитона включает приватный конструктор, статическую коллекцию (обычно Map) для хранения экземпляров по ключам и статический метод доступа, который возвращает экземпляр по указанному ключу.",
-      "details": {
-        "naming_convention": "Принято использовать Map для хранения экземпляров, а метод доступа обычно называют getInstance() с параметром-ключом."
-      }
+      "steps": [
+        "Создайте закрытый конструктор класса.",
+        "Добавьте статическое поле Map<Key, Instance> для хранения объектов.",
+        "Реализуйте публичный статический метод getInstance(key), возвращающий экземпляр по ключу, создающий его при необходимости.",
+        "Обеспечьте потокобезопасность (если требуется)."
+      ]
     },
     "examples": [
       {
         "name": "Базовый Multiton",
         "description": "Простая реализация Multiton с использованием HashMap",
-        "features": [
-          "Потокобезопасность требует дополнительной синхронизации",
-          "Ленивая инициализация экземпляров",
-          "Гибкость в добавлении новых экземпляров"
-        ],
         "code": "public class Multiton {\n    private static final Map<String, Multiton> instances = new HashMap<>();\n\n    private Multiton() {}\n\n    public static synchronized Multiton getInstance(String key) {\n        if (!instances.containsKey(key)) {\n            instances.put(key, new Multiton());\n        }\n        return instances.get(key);\n    }\n}"
       },
       {
         "name": "Multiton с Enum в качестве ключа",
         "description": "Реализация с использованием Enum для типобезопасности ключей",
-        "features": [
-          "Типобезопасные ключи",
-          "Потокобезопасная инициализация",
-          "Чёткое ограничение набора допустимых ключей"
-        ],
         "code": "public enum MultitonKey {\n    INSTANCE_1, INSTANCE_2, INSTANCE_3;\n}\n\npublic class Multiton {\n    private static final EnumMap<MultitonKey, Multiton> instances = new EnumMap<>(MultitonKey.class);\n\n    static {\n        for (MultitonKey key : MultitonKey.values()) {\n            instances.put(key, new Multiton());\n        }\n    }\n\n    private Multiton() {}\n\n    public static Multiton getInstance(MultitonKey key) {\n        return instances.get(key);\n    }\n}"
       },
       {
         "name": "Multiton с фабриками фигур",
         "description": "Пример управления фабриками фигур с помощью Multiton",
-        "features": [
-          "Централизованное управление фабриками",
-          "Гарантия единственности фабрик каждого типа",
-          "Легко расширяется новыми типами фигур"
-        ],
-        "code": "public enum ShapeType {\n    CIRCLE, RECTANGLE, TRIANGLE;\n}\n\npublic interface Shape {\n    void draw();\n}\n\npublic class Circle implements Shape {\n    @Override\n    public void draw() {\n        System.out.println(\"Рисуем круг\");\n    }\n}\n\npublic class ShapeFactoryMultiton {\n    private static final EnumMap<ShapeType, ShapeFactory> instances = new EnumMap<>(ShapeType.class);\n\n    static {\n        instances.put(ShapeType.CIRCLE, Circle::new);\n        instances.put(ShapeType.RECTANGLE, Rectangle::new);\n        instances.put(ShapeType.TRIANGLE, Triangle::new);\n    }\n\n    private ShapeFactoryMultiton() {}\n\n    public static ShapeFactory getInstance(ShapeType type) {\n        return instances.get(type);\n    }\n}"
-      },
-      {
-        "name": "Потокобезопасный Multiton с Double-Checked Locking",
-        "description": "Оптимизированная потокобезопасная реализация",
-        "features": [
-          "Потокобезопасность",
-          "Ленивая инициализация",
-          "Высокая производительность"
-        ],
-        "code": "public class Multiton {\n    private static final ConcurrentMap<String, Multiton> instances = new ConcurrentHashMap<>();\n\n    private Multiton() {}\n\n    public static Multiton getInstance(String key) {\n        return instances.computeIfAbsent(key, k -> new Multiton());\n    }\n}"
+        "code": "// Пример управления ShapeFactory по типам фигур\npublic enum ShapeType {\n    CIRCLE, SQUARE, TRIANGLE;\n}\n\npublic class ShapeFactoryMultiton {\n    private static final Map<ShapeType, ShapeFactoryMultiton> factories = new EnumMap<>(ShapeType.class);\n\n    static {\n        for (ShapeType type : ShapeType.values()) {\n            factories.put(type, new ShapeFactoryMultiton());\n        }\n    }\n\n    private ShapeFactoryMultiton() {}\n\n    public static ShapeFactoryMultiton getInstance(ShapeType type) {\n        return factories.get(type);\n    }\n\n    public void createShape() {\n        // Создание конкретной фигуры\n    }\n}"
       }
     ],
-    "comparison_table": {
-      "title": "Сравнение реализаций Multiton",
-      "headers": ["Реализация", "Потокобезопасность", "Тип ключа", "Инициализация", "Производительность"],
-      "rows": [
-        ["Базовый Multiton", "Синхронизированный", "String", "Ленивая", "Средняя"],
-        ["Multiton с Enum", "Да", "Enum", "Жадная", "Высокая"],
-        ["Фабрики фигур", "Да", "Enum", "Жадная", "Высокая"],
-        ["Double-Checked", "Да", "String", "Ленивая", "Очень высокая"]
-      ]
-    },
-    "criticism": {
-      "title": "Потенциальные проблемы Multiton",
-      "points": [
-        "Усложнение архитектуры по сравнению с простыми Singleton",
-        "Необходимость управления жизненным циклом экземпляров",
-        "Потенциальные проблемы с памятью при большом количестве ключей",
-        "Сложности в тестировании из-за глобального состояния",
-        "Жёсткая привязка клиентского кода к конкретным ключам"
-      ]
-    },
-    "additional_info": {
-      "standard_library_example": "Нет прямой реализации в стандартной библиотеке Java",
-      "literature_references": {
-        "book1": "Design Patterns: Elements of Reusable Object-Oriented Software - Multiton pattern",
-        "book2": "Паттерны проектирования на платформе .NET - Мультитон"
-      },
-      "articles": [
-        "Habr: Мультитон — расширяемый Singleton",
-        "Medium: When to Use Multiton Pattern"
-      ]
-    },
-    "sources": [
-      "Design Patterns: Elements of Reusable Object-Oriented Software",
-      "Паттерны проектирования на платформе .NET",
-      "Habr: Мультитон — расширяемый Singleton"
-    ]
+    "analogies": [
+      "Система языковых локализаций: по коду языка возвращается нужный объект.",
+      "Конфигурации для разных окружений (Dev, Test, Prod) — каждый окруженческий конфиг как отдельный экземпляр."
+    ],
+    "pros": [
+      "Централизованное управление множеством экземпляров.",
+      "Гарантия уникальности экземпляра по ключу.",
+      "Упрощённый доступ к объектам через ключи.",
+      "Удобство для кэширования и повторного использования объектов.",
+      "Может быть расширен под lazy или eager инициализацию."
+    ],
+    "cons": [
+      "Может привести к избыточному потреблению памяти, если объектов слишком много.",
+      "Необходимо управлять жизненным циклом объектов вручную.",
+      "Ограниченная гибкость при необходимости динамического удаления экземпляров.",
+      "Может быть сложнее тестировать из-за глобального состояния.",
+      "Потокобезопасность требует дополнительных усилий."
+    ],
+    "conclusion": "Паттерн Мультитон — мощное расширение Синглтона, позволяющее управлять ограниченным числом экземпляров, идентифицируемых по ключу. Он особенно полезен в задачах, где требуется один объект на уникальный контекст (например, база данных, регион, тип ресурса). Однако его следует применять с осторожностью, чтобы избежать проблем с управлением памятью и тестируемостью. При правильной реализации он способствует повышению производительности за счёт переиспользования уже созданных экземпляров."
   }
 }

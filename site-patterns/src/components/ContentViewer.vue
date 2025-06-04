@@ -7,10 +7,18 @@
 
     <p v-if="pattern.type"><strong>Тип паттерна:</strong> {{ pattern.type }}</p>
 
+    <section v-if="pattern.core_idea">
+      <h2>Основная идея</h2>
+      <p>{{ pattern.core_idea }}</p>
+    </section>
+
     <section v-if="pattern.description">
       <h2>Описание</h2>
       <p v-if="pattern.description.main">{{ pattern.description.main }}</p>
       <p v-if="pattern.description.detailed">{{ pattern.description.detailed }}</p>
+      <ul v-if="pattern.description.bullets?.length">
+        <li v-for="(bullet, index) in pattern.description.bullets" :key="index">{{ bullet }}</li>
+      </ul>
     </section>
 
     <section v-if="pattern.usage_scenarios?.length">
@@ -22,11 +30,15 @@
 
     <section v-if="pattern.structure?.components?.length">
       <h2>Структура паттерна</h2>
-      <div v-for="(component, index) in pattern.structure.components" :key="index" class="structure-component">
+      <div
+        v-for="(component, index) in pattern.structure.components"
+        :key="index"
+        class="structure-component"
+      >
         <h3>{{ component.name }}</h3>
         <p v-if="component.description">{{ component.description }}</p>
         <ul v-if="component.methods?.length">
-          <li v-for="(method, methodIndex) in component.methods" :key="methodIndex">{{ method }}</li>
+          <li v-for="(method, mIndex) in component.methods" :key="mIndex">{{ method }}</li>
         </ul>
       </div>
     </section>
@@ -34,19 +46,9 @@
     <section v-if="pattern.implementation">
       <h2>Реализация</h2>
       <p v-if="pattern.implementation.general">{{ pattern.implementation.general }}</p>
-      
-      <div v-if="pattern.implementation.details">
-        <h3>Детали реализации</h3>
-        <div v-if="pattern.implementation.details.pool_management">
-          <p><strong>Управление пулом:</strong> {{ pattern.implementation.details.pool_management }}</p>
-        </div>
-        <div v-if="pattern.implementation.details.object_reset">
-          <p><strong>Сброс объектов:</strong> {{ pattern.implementation.details.object_reset }}</p>
-        </div>
-        <div v-if="pattern.implementation.details.thread_safety">
-          <p><strong>Потокобезопасность:</strong> {{ pattern.implementation.details.thread_safety }}</p>
-        </div>
-      </div>
+      <ol v-if="pattern.implementation.steps?.length">
+        <li v-for="(step, index) in pattern.implementation.steps" :key="index">{{ step }}</li>
+      </ol>
     </section>
 
     <section v-if="pattern.examples?.length">
@@ -54,78 +56,54 @@
       <div v-for="(ex, index) in pattern.examples" :key="index" class="example">
         <h3>{{ ex.name || 'Без названия' }}</h3>
         <p v-if="ex.description">{{ ex.description }}</p>
-        <ul v-if="ex.features?.length">
-          <li v-for="(feat, idx) in ex.features" :key="idx">{{ feat }}</li>
-        </ul>
         <pre v-if="ex.code" class="java-code">{{ ex.code }}</pre>
       </div>
     </section>
 
-    <section v-if="pattern.advantages?.length">
-      <h2>Преимущества</h2>
+    <section v-if="pattern.analogies?.length">
+      <h2>Аналогии</h2>
       <ul>
-        <li v-for="(adv, index) in pattern.advantages" :key="index">{{ adv }}</li>
-      </ul>
-    </section>
-
-    <section v-if="pattern.disadvantages?.length">
-      <h2>Недостатки</h2>
-      <ul>
-        <li v-for="(disadv, index) in pattern.disadvantages" :key="index">{{ disadv }}</li>
+        <li v-for="(analogy, index) in pattern.analogies" :key="index">{{ analogy }}</li>
       </ul>
     </section>
 
     <section v-if="pattern.comparison_table">
-      <h2>{{ pattern.comparison_table.title || 'Сравнение реализаций' }}</h2>
-      <table v-if="pattern.comparison_table.headers?.length && pattern.comparison_table.rows?.length">
-        <thead>
-          <tr>
-            <th v-for="(header, index) in pattern.comparison_table.headers" :key="index">{{ header }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, rowIndex) in pattern.comparison_table.rows" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section v-if="pattern.criticism">
-      <h2>{{ pattern.criticism.title || 'Критика паттерна' }}</h2>
-      <ul v-if="pattern.criticism.points?.length">
-        <li v-for="(point, index) in pattern.criticism.points" :key="index">{{ point }}</li>
-      </ul>
-    </section>
-
-    <section v-if="pattern.additional_info">
-      <h2>Дополнительная информация</h2>
-      <p v-if="pattern.additional_info.standard_library_example">
-        <strong>Пример в стандартной библиотеке:</strong> {{ pattern.additional_info.standard_library_example }}
-      </p>
-
-      <div v-if="pattern.additional_info.literature_references">
-        <h3>Литература</h3>
-        <ul>
-          <li v-if="pattern.additional_info.literature_references.book1">{{ pattern.additional_info.literature_references.book1 }}</li>
-          <li v-if="pattern.additional_info.literature_references.book2">{{ pattern.additional_info.literature_references.book2 }}</li>
-        </ul>
-      </div>
-
-      <div v-if="pattern.additional_info.articles?.length">
-        <h3>Статьи</h3>
-        <ul>
-          <li v-for="(article, index) in pattern.additional_info.articles" :key="index">{{ article }}</li>
-        </ul>
+      <h2>{{ pattern.comparison_table.title }}</h2>
+      <div class="table-container">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th v-for="(header, index) in pattern.comparison_table.headers" :key="index">{{ header }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, rowIndex) in pattern.comparison_table.rows" :key="rowIndex">
+              <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <section v-if="pattern.sources?.length">
-      <h2>Источники</h2>
+    <section v-if="pattern.pros?.length">
+      <h2>Преимущества</h2>
       <ul>
-        <li v-for="(source, index) in pattern.sources" :key="index">{{ source }}</li>
+        <li v-for="(item, index) in pattern.pros" :key="index">{{ item }}</li>
       </ul>
     </section>
+
+    <section v-if="pattern.cons?.length">
+      <h2>Недостатки</h2>
+      <ul>
+        <li v-for="(item, index) in pattern.cons" :key="index">{{ item }}</li>
+      </ul>
+    </section>
+
+    <section v-if="pattern.conclusion">
+      <h2>Заключение</h2>
+      <p>{{ pattern.conclusion }}</p>
+    </section>
+
   </div>
 
   <div v-else>
@@ -147,7 +125,48 @@ export default {
 </script>
 
 <style scoped>
-/* Общий стиль для всех pre, если используется где-то ещё */
+/* Основные стили заголовков */
+h1 {
+ color: #ff6d00; 
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+h2 {
+  color: #ff6d00; /* Оранжевый цвет как в меню */
+  font-size: 1.8rem;
+  margin: 2rem 0 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+}
+
+h3 {
+ color: #dcdcdc;
+  font-size: 1.4rem;
+  margin: 1.5rem 0 0.8rem;
+}
+
+/* Стили для контента */
+p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: #dcdcdc;
+}
+
+ul, ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* Стили для примеров кода */
 pre {
   background: rgb(14, 13, 13);
   padding: 10px;
@@ -158,7 +177,6 @@ pre {
   font-size: 13px;
 }
 
-/* Специальный стиль для Java-кода */
 .java-code {
   background-color: #282c34;
   color: #dcdcdc;
@@ -172,39 +190,53 @@ pre {
   margin: 10px 0;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 20px 0;
-  background-color: #282c34;
-  color: #dcdcdc;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #282c34;
-}
-
-tr:nth-child(even) {
-  background-color: #282c34;
-}
-
-.structure-component {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #2c3e50;
-  border-radius: 5px;
-}
-
 .example {
   margin-bottom: 30px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #3d4e5f;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* Стили для таблицы */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid #444;
+}
+
+.comparison-table th {
+  background-color: #333;
+  color: #ff6d00;
+  font-weight: 600;
+}
+
+.comparison-table tr:nth-child(even) {
+  background-color: #222;
+}
+
+.comparison-table tr:hover {
+  background-color: #333;
+}
+
+/* Дополнительные акценты */
+strong {
+  color: #333;
+  font-weight: 600;
+}
+
+section {
+  margin-bottom: 2rem;
 }
 </style>
-

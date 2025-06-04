@@ -1,0 +1,101 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Адаптер",
+      "en": "Adapter"
+    },
+    "type": "Структурный",
+    "core_idea": "Предоставление промежуточного слоя между несовместимыми интерфейсами, позволяющего им взаимодействовать без изменения их исходного кода.",
+    "description": {
+      "main": "Адаптер — это структурный паттерн проектирования, который позволяет объектам с несовместимыми интерфейсами работать вместе.",
+      "detailed": "Он преобразует интерфейс одного класса в интерфейс, ожидаемый клиентом. Это позволяет интегрировать сторонние классы в существующую систему без изменения их кода.",
+      "bullets": [
+        "Позволяет интегрировать несовместимые классы",
+        "Изолирует изменения в сторонних классах",
+        "Может использоваться для реализации старых интерфейсов поверх новых"
+      ]
+    },
+    "usage_scenarios": [
+      "Необходимо использовать существующий класс, но его интерфейс несовместим с текущей системой.",
+      "Разработка новых классов, совместимых с существующей системой.",
+      "Интеграция библиотек или систем с разными интерфейсами.",
+      "Преобразование интерфейса одного класса в ожидаемый клиентом."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Клиент",
+          "description": "Класс, который работает через определённый интерфейс.",
+          "methods": []
+        },
+        {
+          "name": "Целевой интерфейс (Target)",
+          "description": "Ожидаемый интерфейс, с которым работает клиент.",
+          "methods": []
+        },
+        {
+          "name": "Адаптируемый класс (Adaptee)",
+          "description": "Класс с несовместимым интерфейсом, который необходимо адаптировать.",
+          "methods": []
+        },
+        {
+          "name": "Адаптер",
+          "description": "Класс, реализующий интерфейс Target и использующий внутри объект Adaptee.",
+          "methods": []
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Адаптер можно реализовать с помощью наследования или композиции. Композиция предпочтительнее, так как она более гибкая.",
+      "steps": [
+        "Определите интерфейс, с которым работает клиент.",
+        "Создайте класс адаптера, реализующий этот интерфейс.",
+        "Добавьте ссылку на адаптируемый объект в адаптер.",
+        "Реализуйте методы интерфейса, делегируя вызовы адаптируемому объекту.",
+        "Используйте адаптер вместо оригинального класса."
+      ]
+    },
+    "examples": [
+      {
+        "name": "Сортировка массива через List",
+        "description": "Адаптер позволяет использовать внешний API, реализующий сортировку списка, для сортировки массива.",
+        "code": "public interface Sorter {\n    int[] sort(int... numbers);\n}\n\npublic final class SorterExternalProduct {\n    List<Integer> sort(List<Integer> numberList) {\n        List<Integer> resList = new ArrayList<>(numberList);\n        Collections.sort(resList);\n        return resList;\n    }\n}\n\npublic class SorterAdapter implements Sorter {\n    private final SorterExternalProduct externalProduct = new SorterExternalProduct();\n\n    @Override\n    public int[] sort(int... numbers) {\n        List<Integer> numberList = new ArrayList<>();\n        for (var number : numbers) numberList.add(number);\n        var sortedList = externalProduct.sort(numberList);\n        for (int i = 0; i < sortedList.size(); i++) numbers[i] = sortedList.get(i);\n        return numbers;\n    }\n}"
+      },
+      {
+        "name": "Адаптер для логгера",
+        "description": "Позволяет использовать новый логгер с существующим интерфейсом Logger.",
+        "code": "public interface Logger {\n    void logInfo(String message);\n    void logError(String message);\n}\n\npublic class NewLogger {\n    public void log(String severity, String message) {\n        System.out.println(\"[\" + severity + \"] \" + message);\n    }\n}\n\npublic class LoggerAdapter implements Logger {\n    private NewLogger newLogger;\n\n    public LoggerAdapter(NewLogger newLogger) {\n        this.newLogger = newLogger;\n    }\n\n    @Override\n    public void logInfo(String message) {\n        newLogger.log(\"INFO\", message);\n    }\n\n    @Override\n    public void logError(String message) {\n        newLogger.log(\"ERROR\", message);\n    }\n}"
+      },
+      {
+        "name": "Java: Arrays.asList",
+        "description": "Метод Arrays.asList адаптирует массив к интерфейсу List, позволяя использовать массивы как коллекции.",
+        "code": "List<String> list = Arrays.asList(\"a\", \"b\", \"c\");"
+      },
+      {
+        "name": "Java: InputStreamReader",
+        "description": "Класс InputStreamReader адаптирует байтовый поток InputStream в символьный поток Reader.",
+        "code": "Reader reader = new InputStreamReader(System.in);"
+      }
+    ],
+    "analogies": [
+      "Переходник для розетки: прибор с вилкой формата A не подходит под розетку формата B, но адаптер позволяет использовать его без переделки прибора."
+    ],
+    "pros": [
+      "Позволяет использовать старый или сторонний код без изменения.",
+      "Снижает связность компонентов.",
+      "Улучшает повторное использование кода."
+    ],
+    "cons": [
+      "Увеличивает количество классов в проекте.",
+      "Может добавить дополнительную сложность.",
+      "Иногда снижает производительность из-за дополнительного слоя."
+    ],
+    "fluent_interface": "Обычно не применяется, так как задача адаптера — преобразование интерфейсов, а не построение цепочек вызовов.",
+    "conclusion": "Адаптер — мощный инструмент при интеграции стороннего или устаревшего кода в современные системы. Он повышает гибкость архитектуры и позволяет повторно использовать существующие компоненты.",
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/adapter",
+      "https://habr.com/ru/articles/437512/",
+      "GoF. Design Patterns: Elements of Reusable Object-Oriented Software"
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Заместитель",
+      "en": "Proxy"
+    },
+    "type": "Структурный",
+    "core_idea": "Предоставление объекта-прокси, имеющего тот же интерфейс, что и реальный объект, для управления доступом к нему и внедрения дополнительного поведения.",
+    "description": {
+      "main": "Прокси — это структурный паттерн проектирования, который позволяет подставлять вместо реальных объектов специальные объекты-заменители. Эти объекты перехватывают вызовы к оригинальному объекту, позволяя сделать что-то до или после передачи вызова оригиналу.",
+      "detailed": "В программировании Прокси позволяет внедрить дополнительную функциональность без изменения исходного объекта. Прокси может выполнять ленивую инициализацию, кэширование, логирование, синхронизацию или контроль доступа.",
+      "bullets": [
+        "Позволяет контролировать доступ к объекту.",
+        "Может использоваться для отложенной инициализации.",
+        "Может выступать в роли кэширующего слоя.",
+        "Является посредником между клиентом и реальной логикой."
+      ]
+    },
+    "usage_scenarios": [
+      "Нужно контролировать доступ к объекту.",
+      "Требуется реализовать ленивую инициализацию ресурсоёмких объектов.",
+      "Необходимо добавить логирование, кэширование или другую обёртку.",
+      "Реализуется удалённый доступ к сервису (например, через сеть)."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Subject",
+          "description": "Общий интерфейс для Реального объекта и Прокси.",
+          "methods": ["request()"]
+        },
+        {
+          "name": "RealSubject",
+          "description": "Реальный объект, выполняющий основную бизнес-логику.",
+          "methods": ["request()"]
+        },
+        {
+          "name": "Proxy",
+          "description": "Заместитель, контролирующий доступ к RealSubject.",
+          "methods": ["request() — может содержать дополнительную логику, а затем делегировать вызов RealSubject"]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Прокси реализует тот же интерфейс, что и объект, который он замещает. Он содержит ссылку на реальный объект и может выполнять действия до или после делегирования вызова.",
+      "steps": [
+        "Определите общий интерфейс для оригинального объекта и прокси.",
+        "Создайте класс оригинального объекта, реализующий этот интерфейс.",
+        "Создайте класс прокси, также реализующий интерфейс и содержащий ссылку на оригинал.",
+        "Внутри прокси добавьте дополнительную логику (например, кэширование) и делегируйте вызовы оригинальному объекту.",
+        "При необходимости, реализуйте ленивую инициализацию реального объекта в прокси."
+      ]
+    },
+    "examples": [
+      {
+        "name": "Кэширующий прокси",
+        "description": "Пример, в котором прокси кэширует результаты запросов, чтобы не обращаться каждый раз к дорогому внешнему ресурсу.",
+        "code": "public interface DataService {\n    String fetchData(String parameter);\n}\n\npublic class DataServiceImpl implements DataService {\n    @Override\n    public String fetchData(String parameter) {\n        simulateExpensiveOperation();\n        return \"Data for \" + parameter;\n    }\n\n    private void simulateExpensiveOperation() {\n        try {\n            System.out.println(\"Fetching data from external source...\");\n            Thread.sleep(3000);\n        } catch (InterruptedException e) {\n            e.printStackTrace();\n        }\n    }\n}\n\nimport java.util.*;\n\npublic class CachingDataServiceProxy implements DataService {\n    private DataService realDataService;\n    private Map<String, String> cache = new HashMap<>();\n\n    public CachingDataServiceProxy(DataService realDataService) {\n        this.realDataService = realDataService;\n    }\n\n    @Override\n    public String fetchData(String parameter) {\n        if (cache.containsKey(parameter)) {\n            System.out.println(\"Returning cached data for: \" + parameter);\n            return cache.get(parameter);\n        }\n\n        System.out.println(\"No cache for: \" + parameter);\n        String data = realDataService.fetchData(parameter);\n        cache.put(parameter, data);\n        return data;\n    }\n}\n\npublic class CachingProxyMain {\n    public static void main(String[] args) {\n        DataService realService = new DataServiceImpl();\n        DataService proxy = new CachingDataServiceProxy(realService);\n\n        System.out.println(proxy.fetchData(\"param1\")); // Загружается\n        System.out.println(proxy.fetchData(\"param1\")); // Из кэша\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Охранник на входе в здание — решает, кого пропускать внутрь, а кого нет.",
+      "Кэш браузера — сначала проверяет, есть ли страница в кэше, прежде чем загружать заново.",
+      "Удалённый представитель — как VPN: запрос идёт не напрямую, а через посредника."
+    ],
+    "pros": [
+      "Позволяет контролировать доступ к объекту.",
+      "Упрощает или ускоряет работу за счёт кэширования.",
+      "Изолирует дополнительную функциональность от основной логики.",
+      "Может использоваться для логирования, мониторинга и безопасности."
+    ],
+    "cons": [
+      "Усложняет структуру программы.",
+      "Может замедлить выполнение при избыточной логике в прокси.",
+      "Дополнительный уровень абстракции требует внимательной поддержки."
+    ],
+    "fluent_interface": "Proxy не предполагает fluent-интерфейс по своей природе, но можно встроить его, если прокси используется в цепочках вызовов.",
+    "conclusion": "Паттерн Прокси позволяет контролировать поведение объектов без изменения их кода, делая архитектуру гибкой и расширяемой. Он широко применяется в кэшировании, контроле доступа, логировании и других задачах, связанных с обёртыванием поведения.",
+    "sources": [
+      "Refactoring.Guru",
+      "GoF Design Patterns",
+      "https://en.wikipedia.org/wiki/Proxy_pattern"
+    ]
+  }
+}

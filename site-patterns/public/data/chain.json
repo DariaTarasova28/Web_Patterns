@@ -1,0 +1,97 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Цепочка обязанностей",
+      "en": "Chain of Responsibility"
+    },
+    "type": "Поведенческий",
+    "core_idea": "Создание цепочки объектов-обработчиков, каждый из которых знает о следующем в цепочке. Запрос передаётся по цепочке, пока один из обработчиков не примет его.",
+    "description": {
+      "main": "Цепочка обязанностей — это поведенческий паттерн проектирования, позволяющий передавать запросы последовательно по цепочке обработчиков.",
+      "detailed": "Каждый обработчик решает, может ли он обработать запрос сам и стоит ли передавать его дальше. Обработчики объединяются в цепь, при этом каждый содержит ссылку на следующий. Запросы могут быть перехвачены и обработаны на любом этапе цепочки, а также могут быть переданы дальше или остановлены.",
+      "bullets": [
+        "Превращает поведения в объекты.",
+        "Позволяет избегать жёсткой привязки отправителя запроса к получателю.",
+        "Даёт гибкость в управлении последовательностью обработки."
+      ]
+    },
+    "usage_scenarios": [
+      "Когда неизвестно, какой объект должен обработать запрос.",
+      "Когда нужно, чтобы несколько объектов имели возможность обработать запрос.",
+      "Когда необходимо избежать жёсткой связи между отправителем и получателем.",
+      "Когда требуется динамически задавать последовательность обработчиков."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Handler (Интерфейс обработчика)",
+          "description": "Определяет метод обработки запроса и ссылку на следующего обработчика.",
+          "methods": [
+            "void setNextHandler(Handler handler)",
+            "void handleRequest(String request)"
+          ]
+        },
+        {
+          "name": "AbstractHandler (Базовый обработчик)",
+          "description": "Реализует логику передачи запроса следующему обработчику и хранит его ссылку.",
+          "methods": [
+            "void setNextHandler(Handler handler)",
+            "void handleRequest(String request) — вызывает обработку следующего"
+          ]
+        },
+        {
+          "name": "ConcreteHandler",
+          "description": "Конкретный обработчик запроса, реализующий проверку и обработку.",
+          "methods": [
+            "void handleRequest(String request) — проверяет и, при необходимости, обрабатывает"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Создайте интерфейс обработчика, реализуйте абстрактный базовый обработчик и конкретные классы. Каждый обработчик должен уметь передавать запрос следующему или остановить цепочку.",
+      "steps": [
+        "Создайте интерфейс `Handler` с методами `setNextHandler()` и `handleRequest()`.",
+        "Реализуйте абстрактный класс `AbstractHandler`, содержащий ссылку на следующий обработчик.",
+        "В `AbstractHandler` реализуйте передачу запроса следующему обработчику.",
+        "Создайте конкретные классы обработчиков, реализующих специфическую логику.",
+        "Соберите цепочку обработчиков в нужной последовательности.",
+        "Передайте запрос первому обработчику — он обработает или передаст дальше."
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример из стандартной библиотеки Java",
+        "description": "Logger из java.util.logging использует Цепочку Обязанностей для обработки сообщений через разных обработчиков.",
+        "code": "import java.util.logging.*;\n\npublic class LoggerChainExample {\n    public static void main(String[] args) {\n        Logger logger = Logger.getLogger(\"MyLogger\");\n        logger.setUseParentHandlers(false);\n\n        ConsoleHandler consoleHandler = new ConsoleHandler();\n        consoleHandler.setLevel(Level.INFO);\n        logger.addHandler(consoleHandler);\n\n        try {\n            FileHandler fileHandler = new FileHandler(\"app.log\");\n            fileHandler.setLevel(Level.FINE);\n            logger.addHandler(fileHandler);\n        } catch (Exception e) {\n            e.printStackTrace();\n        }\n\n        logger.severe(\"Severe message\");\n        logger.warning(\"Warning message\");\n        logger.info(\"Info message\");\n        logger.fine(\"Fine message\");\n    }\n}"
+      },
+      {
+        "name": "Обработка Запросов в Веб-Сервере",
+        "description": "Цепочка обработчиков поочерёдно анализирует HTTP-запросы. Каждый обработчик может обработать или передать запрос дальше.",
+        "code": "public interface Handler {\n    void setNextHandler(Handler handler);\n    void handleRequest(String request);\n}\n\npublic abstract class AbstractHandler implements Handler {\n    protected Handler next;\n    \n    public void setNextHandler(Handler handler) {\n        this.next = handler;\n    }\n\n    public void handleRequest(String request) {\n        if (next != null) {\n            next.handleRequest(request);\n        }\n    }\n}\n\npublic class AuthHandler extends AbstractHandler {\n    public void handleRequest(String request) {\n        if (request.contains(\"auth\")) {\n            System.out.println(\"AuthHandler обработал запрос\");\n        } else {\n            super.handleRequest(request);\n        }\n    }\n}\n\npublic class LoggingHandler extends AbstractHandler {\n    public void handleRequest(String request) {\n        System.out.println(\"Логируем: \" + request);\n        super.handleRequest(request);\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Турникет в метро: если первый не работает, идёшь к следующему.",
+      "Техническая поддержка: запрос сначала попадает к оператору, затем к инженеру, если не решено.",
+      "Цепочка фильтров в браузере: каждый фильтр обрабатывает и передаёт данные дальше."
+    ],
+    "pros": [
+      "Уменьшает связанность между отправителем и получателем запроса.",
+      "Упрощает добавление новых обработчиков.",
+      "Позволяет управлять порядком обработки."
+    ],
+    "cons": [
+      "Запрос может остаться необработанным.",
+      "Отладка может быть сложной при длинной цепочке.",
+      "Производительность может страдать при большом числе обработчиков."
+    ],
+    "fluent_interface": "В паттерне часто используется fluent interface для сборки цепочки: `handler1.setNext(handler2).setNext(handler3);` — это упрощает построение и чтение кода.",
+    "conclusion": "Цепочка обязанностей — гибкий и расширяемый способ обработки запросов, особенно полезный при необходимости поэтапной фильтрации, проверки или трансформации. Он позволяет управлять потоком обработки и легко изменять состав и порядок обработчиков.",
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/chain-of-responsibility",
+      "https://www.baeldung.com/java-chain-of-responsibility",
+      "GoF: Design Patterns, 1994"
+    ]
+  }
+}

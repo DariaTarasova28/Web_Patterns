@@ -1,0 +1,89 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Декоратор",
+      "en": "Decorator"
+    },
+    "type": "Структурный",
+    "core_idea": "Предоставляет способ оборачивания объектов для добавления новых функций, сохраняя при этом интерфейс исходного объекта.",
+    "description": {
+      "main": "Декоратор — это структурный паттерн проектирования, который позволяет динамически менять функциональность объектов, оборачивая их в полезные «обёртки».",
+      "detailed": "В разработке программного обеспечения часто возникает необходимость динамически добавлять объектам новые функциональные возможности без изменения их структуры. Паттерн Декоратор предоставляет гибкое решение этой задачи, позволяя расширять поведение объектов путём оборачивания их в дополнительные компоненты.",
+      "bullets": [
+        "Паттерн декоратор является примером превосходства композиции над наследованием.",
+        "Клиентский код остаётся неизменным при добавлении новых функций через декораторы.",
+        "Декораторы могут комбинироваться между собой в любом порядке."
+      ]
+    },
+    "usage_scenarios": [
+      "Когда необходимо добавить, изменить или удалить поведение объекта без изменения его исходного кода.",
+      "Когда требуется динамически и прозрачно изменять обязанности объекта.",
+      "Когда невозможно использовать наследование для расширения поведения.",
+      "Когда необходимо изменить поведение только одного конкретного объекта, а не всех экземпляров класса."
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Component (Интерфейс)",
+          "description": "Определяет общий интерфейс для объектов и их декораторов.",
+          "methods": ["getContent()"]
+        },
+        {
+          "name": "ConcreteComponent (Конкретный компонент)",
+          "description": "Реализует базовое поведение объекта.",
+          "methods": ["getContent()"]
+        },
+        {
+          "name": "Decorator (Базовый декоратор)",
+          "description": "Содержит ссылку на объект компонента и реализует интерфейс, делегируя вызовы объекту.",
+          "methods": ["getContent()"]
+        },
+        {
+          "name": "ConcreteDecorator (Конкретные декораторы)",
+          "description": "Расширяют поведение, вызывая методы вложенного объекта и добавляя собственную функциональность.",
+          "methods": ["getContent()", "encrypt()", "addTimestamp()"]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Декораторы создаются как обёртки над объектами, реализующими общий интерфейс. Каждая обёртка добавляет своё поведение и передаёт выполнение вложенному объекту.",
+      "steps": [
+        "Создайте интерфейс компонента с общими методами.",
+        "Реализуйте основной класс компонента с базовой логикой.",
+        "Создайте абстрактный класс декоратора, реализующий интерфейс и содержащий ссылку на компонент.",
+        "Реализуйте конкретные декораторы, расширяющие поведение методов.",
+        "Создайте клиентский код, в котором компоненты оборачиваются декораторами в нужной последовательности."
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример работы с сообщениями",
+        "description": "Демонстрация декорирования текстового сообщения шифрованием и временной меткой.",
+        "code": "public interface Message {\n    String getContent();\n}\n\npublic class SimpleMessage implements Message {\n    private String content;\n\n    public SimpleMessage(String content) {\n        this.content = content;\n    }\n\n    @Override\n    public String getContent() {\n        return content;\n    }\n}\n\npublic abstract class MessageDecorator implements Message {\n    protected Message message;\n\n    public MessageDecorator(Message message) {\n        this.message = message;\n    }\n\n    @Override\n    public String getContent() {\n        return message.getContent();\n    }\n}\n\npublic class EncryptedMessageDecorator extends MessageDecorator {\n    public EncryptedMessageDecorator(Message message) {\n        super(message);\n    }\n\n    @Override\n    public String getContent() {\n        return encrypt(message.getContent());\n    }\n\n    private String encrypt(String content) {\n        return new StringBuilder(content).reverse().toString();\n    }\n}\n\npublic class TimestampedMessageDecorator extends MessageDecorator {\n    public TimestampedMessageDecorator(Message message) {\n        super(message);\n    }\n\n    @Override\n    public String getContent() {\n        return addTimestamp(message.getContent());\n    }\n\n    private String addTimestamp(String content) {\n        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss\");\n        String timestamp = LocalDateTime.now().format(formatter);\n        return \"[\" + timestamp + \"] \" + content;\n    }\n}\n\npublic class MessageMain {\n    public static void main(String[] args) {\n        Message simpleMessage = new SimpleMessage(\"Hello, World!\");\n        System.out.println(\"Simple Message: \" + simpleMessage.getContent());\n\n        Message encryptedMessage = new EncryptedMessageDecorator(simpleMessage);\n        System.out.println(\"Encrypted Message: \" + encryptedMessage.getContent());\n\n        Message timestampedMessage = new TimestampedMessageDecorator(simpleMessage);\n        System.out.println(\"Timestamped Message: \" + timestampedMessage.getContent());\n\n        Message encryptedTimestampedMessage = new TimestampedMessageDecorator(encryptedMessage);\n        System.out.println(\"Encrypted & Timestamped Message: \" + encryptedTimestampedMessage.getContent());\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Украшение подарка — коробка остаётся той же, но можно добавлять ленты, банты и обёртку.",
+      "Одежда: можно надеть базовую футболку, сверху куртку, а затем и шарф, каждый элемент добавляет поведение."
+    ],
+    "pros": [
+      "Гибкое добавление функциональности без изменения кода базового класса.",
+      "Комбинирование нескольких декораторов для создания различных комбинаций поведения.",
+      "Следование принципу открытости/закрытости (Open/Closed Principle).",
+      "Прозрачность: клиентский код может не знать о наличии декораторов."
+    ],
+    "cons": [
+      "Увеличение количества классов при большом количестве декораторов.",
+      "Сложность отладки из-за вложенности обёрток.",
+      "Возможные конфликты поведения при неправильной комбинации декораторов."
+    ],
+    "fluent_interface": "Паттерн Декоратор может быть использован совместно с Fluent Interface для создания цепочек вызовов, где каждый декоратор возвращает объект, предоставляющий дальнейшие методы.",
+    "conclusion": "Паттерн Декоратор — мощный инструмент для динамического расширения поведения объектов без изменения их структуры. Особенно полезен в системах, где требуется гибкая и модульная архитектура.",
+    "sources": [
+      "https://refactoring.guru/ru/design-patterns/decorator",
+      "Head First Design Patterns, Freeman",
+      "Design Patterns: Elements of Reusable Object-Oriented Software"
+    ]
+  }
+}
+

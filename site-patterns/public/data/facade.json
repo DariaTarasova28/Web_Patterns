@@ -1,0 +1,105 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Фасад",
+      "en": "Facade"
+    },
+    "type": "Структурный",
+    "description": {
+      "main": "Предоставляет простой интерфейс к сложной системе классов, библиотеке или фреймворку",
+      "detailed": "Паттерн Фасад предлагает решение для упрощения взаимодействия с комплексными системами, снижая связанность между компонентами. Это один из самых простых и часто используемых паттернов, даже без осознания, что это именно Фасад."
+    },
+    "usage_scenarios": [
+      "Когда нужно представить простой или урезанный интерфейс к сложной подсистеме",
+      "Когда требуется разложить подсистему на отдельные слои",
+      "Когда необходимо скрыть особенности реализации от пользователя"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Фасад",
+          "description": "Основной класс, предоставляющий упрощенный интерфейс",
+          "methods": [
+            "Простые методы для выполнения сложных операций",
+            "Делегирование вызовов к подсистеме"
+          ]
+        },
+        {
+          "name": "Подсистемные классы",
+          "description": "Набор сложных классов, реализующих функциональность",
+          "methods": [
+            "Специфические методы подсистемы",
+            "Низкоуровневые операции"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "1. Определить можно ли создать более простой интерфейс\n2. Создать класс фасада\n3. Реализовать методы фасада, делегируя вызовы подсистеме\n4. Обеспечить, чтобы клиент работал только с фасадом",
+      "details": {
+        "initialization": "Фасад должен правильно инициализировать объекты подсистемы",
+        "additional_facades": "При размытии ответственности можно ввести дополнительные фасады"
+      }
+    },
+    "types": [
+      {
+        "name": "Фасад для подсистемы",
+        "description": "Обеспечивает простой интерфейс для взаимодействия с одной подсистемой"
+      },
+      {
+        "name": "Фасад для архитектуры",
+        "description": "Охватывает несколько подсистем, предоставляя единый интерфейс"
+      }
+    ],
+    "examples": [
+      {
+        "name": "Примеры в стандартной библиотеке Java",
+        "description": "Классы, предоставляющие упрощенный интерфейс к сложным системам",
+        "items": [
+          {
+            "name": "java.lang.Runtime",
+            "description": "Предоставляет интерфейс к среде выполнения Java"
+          },
+          {
+            "name": "java.util.Collections",
+            "description": "Статические методы для операций над коллекциями"
+          },
+          {
+            "name": "java.util.Arrays",
+            "description": "Методы для работы с массивами"
+          }
+        ]
+      },
+      {
+        "name": "Двигатель автомобиля",
+        "description": "Фасад для запуска и остановки двигателя",
+        "code": "public class CarEngineFacade {\n    private static int DEFAULT_COOLING_TEMP = 90;\n    private static int MAX_ALLOWED_TEMP = 50;\n    private FuelInjector fuelInjector = new FuelInjector();\n    private AirFlowController airFlowController = new AirFlowController();\n    private Starter starter = new Starter();\n    private CoolingController coolingController = new CoolingController();\n    private CatalyticConverter catalyticConverter = new CatalyticConverter();\n\n    public void startEngine() {\n        fuelInjector.on();\n        airFlowController.takeAir();\n        fuelInjector.on();\n        fuelInjector.inject();\n        starter.start();\n        coolingController.setTemperatureUpperLimit(DEFAULT_COOLING_TEMP);\n        coolingController.run();\n        catalyticConverter.on();\n    }\n\n    public void stopEngine() {\n        fuelInjector.off();\n        catalyticConverter.off();\n        coolingController.cool(MAX_ALLOWED_TEMP);\n        coolingController.stop();\n        airFlowController.off();\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        CarEngineFacade carEngineFacade = new CarEngineFacade();\n        carEngineFacade.startEngine();\n        carEngineFacade.stopEngine();\n    }\n}"
+      },
+      {
+        "name": "Работа с файлами",
+        "description": "Фасад для упрощения операций с файловой системой",
+        "code": "public interface FileFacade {\n    void createFile(String path) throws IOException;\n    void deleteFile(String path) throws IOException;\n    void writeFile(String path, String content) throws IOException;\n    String readFile(String path) throws IOException;\n}\n\npublic class FileFacadeImpl implements FileFacade {\n    @Override\n    public void createFile(String path) throws IOException {\n        File file = new File(path);\n        if (file.createNewFile()) {\n            System.out.println(\"File created: \" + path);\n        } else {\n            System.out.println(\"File already exists: \" + path);\n        }\n    }\n\n    @Override\n    public void deleteFile(String path) throws IOException {\n        Files.deleteIfExists(Paths.get(path));\n        System.out.println(\"File deleted: \" + path);\n    }\n\n    @Override\n    public void writeFile(String path, String content) throws IOException {\n        BufferedWriter writer = new BufferedWriter(new FileWriter(path));\n        writer.write(content);\n        writer.close();\n        System.out.println(\"Written to file: \" + path);\n    }\n\n    @Override\n    public String readFile(String path) throws IOException {\n        String content = new String(Files.readAllBytes(Paths.get(path)));\n        System.out.println(\"Read from file: \" + path);\n        return content;\n    }\n}\n\npublic class FileMain {\n    public static void main(String[] args) {\n        FileFacade fileFacade = new FileFacadeImpl();\n        String filePath = \"example.txt\";\n\n        try {\n            fileFacade.createFile(filePath);\n            fileFacade.writeFile(filePath, \"Hello, Facade Pattern!\");\n            String content = fileFacade.readFile(filePath);\n            System.out.println(\"File Content: \" + content);\n            fileFacade.deleteFile(filePath);\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n}"
+      }
+    ],
+    "advantages": [
+      "Упрощение интерфейса: Клиенты взаимодействуют через простой интерфейс",
+      "Снижение связанности: Изоляция клиентов от деталей реализации",
+      "Упрощение использования: Сложные операции через несколько простых методов",
+      "Повышение модульности: Улучшение структуры кода"
+    ],
+    "disadvantages": [
+      "Ограничение гибкости: Клиентский код может не иметь доступа к тонким аспектам подсистемы",
+      "Дополнительный уровень абстракции: Увеличение количества классов",
+      "Необходимость поддерживать фасад: При изменении подсистемы"
+    ],
+    "criticism": {
+      "points": [
+        "Может ограничивать доступ к расширенным функциям подсистемы",
+        "При неправильном использовании может стать \"божественным объектом\"",
+        "Дополнительный слой может усложнить отладку"
+      ]
+      ,
+    "conclusion": "Паттерн проектирования Фасад является мощным инструментом для упрощения взаимодействия с комплексными системами и подсистемами. Он предоставляет клиентам единый, упрощённый интерфейс, скрывая внутреннюю сложность и снижая связанность между компонентами системы.Правильное применение паттерна Фасад способствует созданию более чистой, модульной и легко поддерживаемой архитектуры приложений. Однако, как и любой паттерн, его следует применять осознанно, учитывая требования и специфику проекта, чтобы избежать избыточной абстракции и усложнения системы."
+    }
+}
+}

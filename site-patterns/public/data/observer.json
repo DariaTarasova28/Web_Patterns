@@ -1,0 +1,89 @@
+{
+  "pattern": {
+    "name": {
+      "ru": "Наблюдатель",
+      "en": "Observer"
+    },
+    "type": "Поведенческий паттерн проектирования",
+    "core_idea": "Паттерн Observer (Наблюдатель) реализует принцип \"один ко многим\" и позволяет объекту (называемому наблюдаемый или subject) уведомлять подписанные на него объекты (наблюдатели) об изменениях, не раскрывая своей внутренней структуры.",
+    "description": {
+      "main": "Паттерн Наблюдатель разделяет объекты на наблюдаемые (subjects) и наблюдатели (observers). Наблюдаемые объекты управляют списком наблюдателей и уведомляют их об изменениях своего состояния. Наблюдатели реализуют интерфейс, который позволяет им реагировать на эти уведомления.",
+      "bullets": [
+        "Поддерживает слабую связанность между объектами",
+        "Позволяет динамически добавлять и удалять наблюдателей",
+        "Широко используется в GUI и реактивном программировании"
+      ]
+    },
+    "usage_scenarios": [
+      "Необходимо обеспечить автоматическое обновление множества объектов при изменении состояния одного объекта",
+      "Хочется поддерживать слабую связанность между объектами",
+      "Необходимо поддерживать одну из архитектурных моделей типа MVC",
+      "Когда количество наблюдателей может динамически изменяться во время выполнения программы"
+    ],
+    "structure": {
+      "components": [
+        {
+          "name": "Subject (Наблюдаемый)",
+          "description": "Объект, за которым наблюдают. Хранит список наблюдателей и уведомляет их об изменениях.",
+          "methods": [
+            "addObserver() - добавляет наблюдателя",
+            "removeObserver() - удаляет наблюдателя",
+            "notifyObservers() - уведомляет всех наблюдателей"
+          ]
+        },
+        {
+          "name": "Observer (Наблюдатель)",
+          "description": "Интерфейс, который должен реализовать каждый наблюдатель.",
+          "methods": [
+            "update() - метод, вызываемый при изменении состояния наблюдаемого объекта"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "general": "Реализация паттерна Observer включает создание интерфейсов для наблюдателей и наблюдаемого объекта, а также конкретных классов, реализующих эти интерфейсы.",
+      "steps": [
+        "Создать интерфейс подписчиков (Observer) с методом оповещения",
+        "Создать интерфейс издателей (Subject) с методами управления подпиской",
+        "Реализовать класс конкретного издателя",
+        "Реализовать классы конкретных подписчиков",
+        "В клиентском коде подписать наблюдателей на издателя"
+      ]
+    },
+    "examples": [
+      {
+        "name": "Пример с датчиком температуры",
+        "description": "Демонстрирует использование паттерна для уведомления дисплеев и сигнализации об изменении температуры.",
+        "code": "interface Observer {\n    void update(float temperature);\n}\ninterface Subject {\n    void addObserver(Observer observer);\n    void removeObserver(Observer observer);\n    void notifyObservers();\n}\n\nclass TemperatureSensor implements Subject {\n    private float temperature;\n    private List<Observer> observers;\n\n    public TemperatureSensor() {\n        observers = new ArrayList<>();\n    }\n\n    public void setTemperature(float temperature) {\n        this.temperature = temperature;\n        notifyObservers();\n    }\n\n    @Override\n    public void addObserver(Observer observer) {\n        observers.add(observer);\n    }\n\n    @Override\n    public void removeObserver(Observer observer) {\n        observers.remove(observer);\n    }\n\n    @Override\n    public void notifyObservers() {\n        for (Observer observer : observers) {\n            observer.update(temperature);\n        }\n    }\n}"
+      },
+      {
+        "name": "Общий пример реализации",
+        "description": "Базовая реализация паттерна Observer с одним наблюдаемым объектом и несколькими наблюдателями.",
+        "code": "// Интерфейс Observer\ninterface Observer {\n    void update(String message);\n}\n// Класс Subject (наблюдаемый)\nclass Subject {\n    private List<Observer> observers = new ArrayList<>();\n    private String state;\n\n    public void addObserver(Observer observer) {\n        observers.add(observer);\n    }\n\n    public void removeObserver(Observer observer) {\n        observers.remove(observer);\n    }\n\n    public void notifyObservers() {\n        for (Observer observer : observers) {\n            observer.update(state);\n        }\n    }\n\n    public void setState(String state) {\n        this.state = state;\n        notifyObservers();\n    }\n}"
+      }
+    ],
+    "analogies": [
+      "Подписка на журнал: издатель (журнал) отправляет новые выпуски подписчикам",
+      "Система уведомлений: приложение уведомляет пользователей о новых событиях",
+      "Метеостанция: собирает данные и уведомляет все дисплеи о изменениях погоды"
+    ],
+    "pros": [
+      "Снижение связанности между объектами",
+      "Удобство добавления новых наблюдателей",
+      "Поддержка динамического взаимодействия",
+      "Повторное использование кода"
+    ],
+    "cons": [
+      "Неопределенность порядка уведомлений",
+      "Потенциальные проблемы с производительностью",
+      "Риск утечек памяти",
+      "Сложность отладки"
+    ],
+    "conclusion": "Паттерн Наблюдатель (Observer) является мощным инструментом для создания гибких и расширяемых систем, позволяя объектам взаимодействовать между собой без жесткой связанности. Он широко используется в различных областях разработки, таких как пользовательские интерфейсы, системы уведомлений и реактивное программирование.",
+    "sources": [
+      "Design Patterns: Elements of Reusable Object-Oriented Software (Gang of Four)",
+      "Java API документация (java.util.Observer, java.util.Observable)",
+      "Приемы объектно-ориентированного проектирования. Паттерны проектирования - Э. Гамма и др."
+    ]
+  }
+}
